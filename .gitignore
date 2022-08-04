@@ -22,7 +22,6 @@ build/
 .env.production.local
 .env
 
-.gitignore
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
