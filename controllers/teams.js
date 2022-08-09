@@ -9,6 +9,7 @@ teamsRouter.get('/teams', (req, res, next) => {
         .catch(error => next(error))
 })
 
+// Add a new team
 teamsRouter.post('/teams', (req, res, next) => {
     const body = req.body
     console.log("body", body)
@@ -28,12 +29,12 @@ teamsRouter.get('/teams/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
-// Receives Vacationer to add to team
-teamsRouter.put('/teams/:id', (req, res, next) => {
+// Add a new member (vacationer) to team
+teamsRouter.post('/teams/:id', (req, res, next) => {
     const teamId = req.params.id;
     const newMember = {name: req.body.name, vacationerId: req.body.id};
 
-    console.log("Adding newMember:", newMember, " ", " to ->", teamId);
+    console.log("Adding newMember:", newMember, " ", " to teamId:", teamId);
 
     Team.findByIdAndUpdate(
         teamId, {$push: {members: newMember}}, {new: true, runValidators: true, context: 'query'})
@@ -43,6 +44,7 @@ teamsRouter.put('/teams/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
+// Change team name
 teamsRouter.patch('/teams/:id', (req, res, next) => {
     const teamId = req.params.id;
     const newName = req.body.newName;
@@ -90,7 +92,7 @@ teamsRouter.put('/teams/members/all', (req, res, next) => {
         .catch(error => next(error))
 })
 
-// Delete a team member from spesific team
+// Delete a team member from specific team
 teamsRouter.put('/teams/members/:id', (req, res, next) => {
     const teamId = req.params.id;
     const memberId = req.body.vacationerId;
@@ -106,6 +108,7 @@ teamsRouter.put('/teams/members/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
+// Delete a team by id
 teamsRouter.delete('/teams/:id', (req, res, next) => {
     Team.findByIdAndRemove(req.params.id)
         .then(deletedTeam => {

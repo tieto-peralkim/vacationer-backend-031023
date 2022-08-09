@@ -1,4 +1,4 @@
-const fetchVacationsBetween = require("./functions.js");
+const fetchVacationsBetween = require("./fetcher.js");
 
 // Creates the array of dates with vacationer numbers
 //https://dev.to/ashikpaul42/how-to-count-occurrences-of-dates-in-an-array-of-date-ranges-javascript-kjo
