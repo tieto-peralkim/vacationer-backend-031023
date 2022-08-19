@@ -27,7 +27,18 @@ vacationersRouter.get('/vacationers/:vacationerId', (req, res, next) => {
         .catch(error => next(error))
 })
 
-// Change user name
+// Add a vacationer
+vacationersRouter.post('/vacationers', (req, res, next) => {
+    const body = req.body
+    const VacationerObject = new Vacationer(body)
+    VacationerObject.save()
+        .then(savedVacationer => {
+            res.status(201).json(savedVacationer)
+        })
+        .catch(error => next(error))
+})
+
+// Change vacationer name
 vacationersRouter.patch('/vacationers/:vacationerId', (req, res, next) => {
     const userId = req.params.vacationerId;
     const newName = req.body.newName;
@@ -43,6 +54,7 @@ vacationersRouter.patch('/vacationers/:vacationerId', (req, res, next) => {
 
 })
 
+// Remove vacationer
 vacationersRouter.delete('/vacationers/:vacationerId', (req, res, next) => {
     Vacationer.findByIdAndRemove(req.params.vacationerId)
         .then(deletedVacationer => {
