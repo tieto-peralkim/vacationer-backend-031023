@@ -1,0 +1,2 @@
+mongoimport --db vacation-data --collection teams --file /docker-entrypoint-initdb.d/teams.json --jsonArray
+mongoimport --db vacation-data --collection vacationers --file /docker-entrypoint-initdb.d/vacationers.json --jsonArray
