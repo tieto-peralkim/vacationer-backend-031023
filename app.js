@@ -9,15 +9,34 @@ const timeframesRouter = require('./controllers/timeframes')
 
 const middleWare = require('./utils/middleware')
 const mongoose = require('mongoose')
+const SecretsManager = require("./SecretsManager");
+let MONGODB_URI;
 
-mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-        console.log('connected to MongoDB')
+
+const retrieveSecret = () => SecretsManager.getSecret("paivaa", "eu-west-1")
+    .then((secret) => {
+        MONGODB_URI = secret.MONGODB_URI;
+        connectToMongoDB(MONGODB_URI);
     })
     .catch((error) => {
-        console.log('error connecting to MongoDB:', error.message)
+        console.log("error retrieving the secret:", error.message)
     })
 
+const connectToMongoDB = (path) => {
+    mongoose.connect(path, {useNewUrlParser: true, useUnifiedTopology: true})
+        .then(() => {
+            let admin = new mongoose.mongo.Admin(mongoose.connection.db);
+            admin.buildInfo(function (err, info) {
+                console.log("Mongo version is", info.version);
+                console.log('connected to MongoDB')
+            });
+        })
+        .catch((error) => {
+            console.log("error connecting to MongoDB:", error.message)
+        })
+}
+
+retrieveSecret();
 app.use(cors())
 //app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());

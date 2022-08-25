@@ -1,9 +1,8 @@
 require('dotenv').config()
 
-const PORT = process.env.PORT;
-const MONGODB_URI = process.env.MONGODB_URI
+const {DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, NODE_LOCAL_PORT} = process.env;
 
 module.exports = {
-    PORT,
-    MONGODB_URI
+    //MONGODB_URI: `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}?retryWrites=true&w=majority`,
+    NODE_LOCAL_PORT
 }
