@@ -3,6 +3,7 @@ services:
   app:
     container_name: app
     restart: always
+    image: 629517020360.dkr.ecr.eu-west-1.amazonaws.com/ecr-vacationer-backend
     build: .
     ports:
       - "3001:3001"
