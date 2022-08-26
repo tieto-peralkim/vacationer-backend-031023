@@ -1,6 +1,10 @@
 version: "2"
 services:
   app:
+    tty: true
+    stdin_open: true
+    depends_on:
+      - 'mongo'
     container_name: app
     restart: always
     image: 629517020360.dkr.ecr.eu-west-1.amazonaws.com/ecr-vacationer-backend
@@ -9,13 +13,12 @@ services:
       - "3001:3001"
 #    env_file:
 #      - .env
-  db:
-    image: mongo
-    container_name: mongodb
+  mongo:
+    container_name: mongo
+    image: 'mongo:5.0.11'
     ports:
       - "27017:27017"
-    environment:
-    - MONGO_INITDB_DATABASE=vacation-data
     volumes: 
-      - ./data:/data/db
-      - ./initial_data:/docker-entrypoint-initdb.d
+      - 'mongo:/data/db'
+volumes:
+  mongo:

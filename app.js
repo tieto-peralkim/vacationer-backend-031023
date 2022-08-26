@@ -1,4 +1,3 @@
-const config = require('./utils/config')
 const express = require('express');
 const morgan = require('morgan')
 const app = express();
@@ -12,9 +11,9 @@ const mongoose = require('mongoose')
 const SecretsManager = require("./SecretsManager");
 let MONGODB_URI;
 
-
-const retrieveSecret = () => SecretsManager.getSecret("paivaa", "eu-west-1")
+const retrieveSecret = () => SecretsManager.getSecret("vacationer-secrets", "eu-west-1")
     .then((secret) => {
+        console.log("salaisuus", secret)
         MONGODB_URI = secret.MONGODB_URI;
         connectToMongoDB(MONGODB_URI);
     })

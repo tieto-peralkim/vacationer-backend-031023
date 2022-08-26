@@ -2,7 +2,6 @@
 const AWS = require('aws-sdk');
 
 class SecretsManager {
-
 // In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
 // See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
 // We rethrow the exception by default.
