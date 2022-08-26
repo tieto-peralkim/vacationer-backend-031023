@@ -27,7 +27,7 @@
         }
     ],
     "family": "vacationer-backend",
-    "executionRoleArn": "arn:aws:iam::629517020360:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::629517020360:role/vacationer-role",
     "networkMode": "awsvpc",
     "revision": 13,
     "volumes": [],
