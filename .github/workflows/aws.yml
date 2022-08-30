@@ -81,11 +81,8 @@ jobs:
         echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
         echo "AWS_DEFAULT_REGION=${{ env.AWS_REGION }}" >> .env
         
-        docker-compose build
-        docker-compose up
-        
-        #docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        #docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
