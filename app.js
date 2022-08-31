@@ -11,7 +11,7 @@ const mongoose = require('mongoose')
 const SecretsManager = require("./SecretsManager");
 let MONGODB_URI;
 
-const retrieveSecret = () => SecretsManager.getSecret("vacationer-secrets", "eu-west-1")
+const retrieveSecret = () => SecretsManager.getSecret("arn:aws:secretsmanager:eu-west-1:314500401006:secret:vacationer-secrets-25ri86", "eu-west-1")
     .then((secret) => {
         console.log("salaisuus", secret)
         MONGODB_URI = secret.MONGODB_URI;
