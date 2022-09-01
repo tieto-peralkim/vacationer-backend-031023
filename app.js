@@ -1,3 +1,4 @@
+const config = require('./utils/config')
 const express = require('express');
 const morgan = require('morgan')
 const app = express();
@@ -9,19 +10,19 @@ const timeframesRouter = require('./controllers/timeframes')
 const middleWare = require('./utils/middleware')
 const mongoose = require('mongoose')
 const SecretsManager = require("./SecretsManager");
-let MONGODB_URI;
 
-const retrieveSecret = () => SecretsManager.getSecret("arn:aws:secretsmanager:eu-west-1:629517020360:secret:vacationer-secrets-QY9I4S", "eu-west-1")
-    .then((secret) => {
-        console.log("salaisuus", secret)
-        MONGODB_URI = secret.MONGODB_URI;
-        connectToMongoDB(MONGODB_URI);
-    })
-    .catch((error) => {
-        console.log("error retrieving the secret:", error.message)
-    })
+// const retrieveSecret = () => SecretsManager.getSecret("vacationer-secrets", "eu-west-1")
+//     .then((secret) => {
+//         console.log("salaisuus", secret)
+//         MONGODB_URI = secret.MONGODB_URI;
+//         connectToMongoDB(MONGODB_URI);
+//     })
+//     .catch((error) => {
+//         console.log("error retrieving the secret:", error.message)
+//     })
 
 const connectToMongoDB = (path) => {
+    console.log("connectToMongoDB path:", path)
     mongoose.connect(path, {useNewUrlParser: true, useUnifiedTopology: true})
         .then(() => {
             let admin = new mongoose.mongo.Admin(mongoose.connection.db);
@@ -35,7 +36,8 @@ const connectToMongoDB = (path) => {
         })
 }
 
-retrieveSecret();
+connectToMongoDB(config.MONGODB_URI);
+
 app.use(cors())
 //app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
