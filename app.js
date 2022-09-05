@@ -1,25 +1,20 @@
 const config = require('./utils/config')
-const express = require('express');
+const express = require('express')
 const morgan = require('morgan')
-const app = express();
+const app = express()
 const cors = require('cors')
 const vacationsRouter = require('./controllers/vacationers')
 const teamsRouter = require('./controllers/teams')
 const timeframesRouter = require('./controllers/timeframes')
-
 const middleWare = require('./utils/middleware')
 const mongoose = require('mongoose')
-const SecretsManager = require("./SecretsManager");
+const cron = require('node-cron')
+const sendToSlack = require('./functions/slack')
 
-// const retrieveSecret = () => SecretsManager.getSecret("vacationer-secrets", "eu-west-1")
-//     .then((secret) => {
-//         console.log("salaisuus", secret)
-//         MONGODB_URI = secret.MONGODB_URI;
-//         connectToMongoDB(MONGODB_URI);
-//     })
-//     .catch((error) => {
-//         console.log("error retrieving the secret:", error.message)
-//     })
+// At 12 every Monday '0 12 * * 1', at every minute "* * * * *"
+cron.schedule('0 13 * * 1', () => {
+    sendToSlack();
+})
 
 const connectToMongoDB = (path) => {
     console.log("connectToMongoDB path:", path)

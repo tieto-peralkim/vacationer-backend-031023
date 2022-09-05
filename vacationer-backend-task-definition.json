@@ -1,5 +1,5 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:eu-west-1:629517020360:task-definition/vacationer-backend:13",
+    "taskDefinitionArn": "arn:aws:ecs:eu-west-1:629517020360:task-definition/vacationer-backend:26",
     "containerDefinitions": [
         {
             "name": "vacationer-backend",
@@ -29,7 +29,7 @@
     "family": "vacationer-backend",
     "executionRoleArn": "arn:aws:iam::629517020360:role/vacationer-role",
     "networkMode": "awsvpc",
-    "revision": 13,
+    "revision": 26,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -68,6 +68,6 @@
     ],
     "cpu": "256",
     "memory": "2048",
-    "registeredAt": "2022-08-25T16:58:35.007000+03:00",
+    "registeredAt": "2022-09-01T14:16:29.826000+03:00",
     "registeredBy": "arn:aws:sts::629517020360:assumed-role/TietoCemAmsSandbox/GitHubActions"
 }

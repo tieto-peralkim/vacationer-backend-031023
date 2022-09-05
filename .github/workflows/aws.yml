@@ -73,16 +73,14 @@ jobs:
         #IMAGE_TAG: ${{ github.sha }}
         IMAGE_TAG: latest
       run: |
+        touch .env
+        echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
+        echo "REACT_APP_DB_ADDRESS=${{ secrets.REACT_APP_DB_ADDRESS }}" >> .env
+        echo "REACT_APP_SLACK_URI=${{ secrets.REACT_APP_SLACK_URI }}" >> .env
+        
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
-        touch .env
-        echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
-        
-        #echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
-        #echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
-        #echo "AWS_DEFAULT_REGION=${{ env.AWS_REGION }}" >> .env
-        
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         
