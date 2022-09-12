@@ -47,10 +47,9 @@ timeframesRouter.get('/vacationeramount', (req, res, next) => {
 
 // Returns all single holidays between start and end dates
 timeframesRouter.get('/holidaysbetween', (req, res, next) => {
-    let start = req.query.start;
-    let end = req.query.end;
-    console.log("start ", start)
-    console.log("end ", end)
+    let start = new Date(req.query.start);
+    let end = new Date(req.query.end);
+    console.log("holidaysbetween:", start, "-", end)
 
     Vacationer.aggregate([
             {
@@ -63,12 +62,12 @@ timeframesRouter.get('/holidaysbetween', (req, res, next) => {
                     $and: [
                         {
                             "vacations.end": {
-                                $gte: (new Date(start))
+                                $gte: start
                             }
                         },
                         {
                             "vacations.start": {
-                                $lte: (new Date(end))
+                                $lte: end
                             }
                         }
                     ]

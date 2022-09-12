@@ -17,7 +17,6 @@ cron.schedule('0 13 * * 1', () => {
 })
 
 const connectToMongoDB = (path) => {
-    console.log("connectToMongoDB path:", path)
     mongoose.connect(path, {useNewUrlParser: true, useUnifiedTopology: true})
         .then(() => {
             let admin = new mongoose.mongo.Admin(mongoose.connection.db);
@@ -27,7 +26,7 @@ const connectToMongoDB = (path) => {
             });
         })
         .catch((error) => {
-            console.log("error connecting to MongoDB:", error.message)
+            console.log("error connectiqng to MongoDB:", error.message)
         })
 }
 

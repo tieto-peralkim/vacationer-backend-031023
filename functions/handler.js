@@ -10,8 +10,12 @@ async function handleVacationData(start, end) {
 
     for (let i = 0; i < holidaysBetweenDates.length; i++) {
         let vacationObject = {}
-        vacationObject["start"] = new Date(holidaysBetweenDates[i].vacations.start)
-        vacationObject["end"] = new Date(holidaysBetweenDates[i].vacations.end)
+
+        let startDate = new Date(holidaysBetweenDates[i].vacations.start)
+        let endDate = new Date(holidaysBetweenDates[i].vacations.end)
+
+        vacationObject["start"] = startDate
+        vacationObject["end"] = endDate
         vacationObject["vacationers"] = holidaysBetweenDates[i].name
         holidayTimes.push(vacationObject)
     }
@@ -20,8 +24,12 @@ async function handleVacationData(start, end) {
     let earlyDate = new Date(start)
     let lateDate = new Date(end)
 
+    console.log("earlyDate1:", earlyDate)
+    console.log("lateDate1:", lateDate)
+
     let arrayOfDates = []
     while (earlyDate <= lateDate) {
+        earlyDate.setUTCHours(0,0,0,0)
         let count = 0
         let vacationersOfDay = []
         holidayTimes.forEach(
