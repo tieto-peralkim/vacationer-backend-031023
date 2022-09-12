@@ -12,7 +12,7 @@ const cron = require('node-cron')
 const sendToSlack = require('./functions/slack')
 
 // At 12 every Monday '0 12 * * 1', at every minute "* * * * *"
-cron.schedule('20 13 * * 1', () => {
+cron.schedule('40 13 * * 1', () => {
         sendToSlack()
     }, {
         timezone: "Europe/Helsinki"

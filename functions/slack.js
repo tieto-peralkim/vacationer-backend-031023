@@ -7,11 +7,11 @@ const nextMonday = new Date();
 nextMonday.setUTCDate(
     today.getUTCDate() + ((1 + 7 - today.getUTCDay()) % 7 || 7)
 );
-nextMonday.setUTCHours(12, 0, 0, 0);
+nextMonday.setUTCHours(0, 0, 0, 0);
 
 const nextFriday = new Date();
 nextFriday.setTime(nextMonday.getTime() + 4 * 24 * 60 * 60 * 1000);
-nextFriday.setUTCHours(12, 0, 0, 0);
+nextFriday.setUTCHours(0, 0, 0, 0);
 
 const slackMessage = (vacationerAmount, weekList) => {
     for (let i = 0; i < weekList.length; i++) {
