@@ -28,7 +28,7 @@ const connectToMongoDB = (path) => {
             });
         })
         .catch((error) => {
-            console.log("error connectiqng to MongoDB:", error.message)
+            console.log("error connecting to MongoDB:", error.message)
         })
 }
 
