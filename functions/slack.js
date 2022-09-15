@@ -40,10 +40,10 @@ const sendToSlack = () => {
     let numberOfVacationers = 0;
     let vacationersPerDay = []
 
-    axios.get(`http://${process.env.REACT_APP_DB_ADDRESS}:3001/vacationeramount?start=${nextMonday.toISOString()}&end=${nextFriday.toISOString()}`)
+    axios.get(`http://${process.env.REACT_APP_BACKEND_ADDRESS}:3001/vacationeramount?start=${nextMonday.toISOString()}&end=${nextFriday.toISOString()}`)
         .then((response) => {
             numberOfVacationers = response.data.length;
-            axios.get(`http://${process.env.REACT_APP_DB_ADDRESS}:3001/timespan?start=${nextMonday.toISOString()}&end=${nextFriday.toISOString()}`)
+            axios.get(`http://${process.env.REACT_APP_BACKEND_ADDRESS}:3001/timespan?start=${nextMonday.toISOString()}&end=${nextFriday.toISOString()}`)
                 .then((response) => {
                     console.log("Timespan response", response.data)
                     vacationersPerDay = response.data;

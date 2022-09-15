@@ -12,5 +12,4 @@
 2. add right user for backend github secret credentials / change github secret credentials to some AWS solution eg?
 3. open backend in port 3001 ?
 4. fix env variables (KP)
-5. add the cron to backend server (see KP thesis)
-6. fix AWS settings (removing containers, container naming, cleanups, billing… )
+5. fix AWS settings (removing containers, container naming, cleanups, billing… )
