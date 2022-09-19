@@ -1,18 +1,8 @@
-# This workflow will build and push a new container image to Amazon ECR,
+# This workflow will build and push a new backend container image to Amazon ECR and run the container in EC2,
 # when there is a push to the "main" branch.
 #
-# To use this workflow, you will need to complete the following set-up steps:
-#
-# 1. Create an ECR repository to store your images.
-#    For example: `aws ecr create-repository --repository-name my-ecr-repo --region us-east-2`.
-#    Replace the value of the `ECR_REPOSITORY` environment variable in the workflow below with your repository's name.
-#    Replace the value of the `AWS_REGION` environment variable in the workflow below with your repository's region.
-#
-# 2. Store an IAM user access key in GitHub Actions secrets named `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
-#    See the documentation for each action used below for the recommended IAM policies for this IAM user,
-#    and best practices on handling the access key credentials.
 
-name: Deploy to Amazon ECS
+name: Deploy to Amazon ECR and EC2
 
 on:
   push:
@@ -20,8 +10,9 @@ on:
       - "main"
 
 env:
-  AWS_REGION: eu-west-1                       # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: ecr-vacationer-backend      # set this to your Amazon ECR repository name
+  AWS_REGION: eu-west-1
+  ECR_REPOSITORY: ecr-vacationer-backend
+  IMAGE: backend
 
 permissions:
   contents: read
@@ -64,5 +55,24 @@ jobs:
         # be deployed to ECS.
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Public IP of Github Actions
+      id: ip
+      uses: haythem/public-ip@v1.2
+
+    - name: Add Github Actions IP to Security group
+      run: |
+        aws ec2 authorize-security-group-ingress --group-id sg-04127401a70f9646c --protocol tcp --port 0-65535 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+    - name: SSH to EC2 and replace the docker containers
+      env:
+        PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+        EC2_INSTANCE: ${{ secrets.EC2_INSTANCE }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+        ssh -o StrictHostKeyChecking=no -i private_key $EC2_INSTANCE 'bash -s' < restart.sh $IMAGE
+
+    - name: Remove Github Actions IP from Security group
+      run: |
+        aws ec2 revoke-security-group-ingress --group-id sg-04127401a70f9646c --protocol tcp --port 0-65535 --cidr ${{ steps.ip.outputs.ipv4 }}/32
