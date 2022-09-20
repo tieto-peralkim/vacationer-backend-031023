@@ -46,8 +46,8 @@ jobs:
         IMAGE_TAG: latest
       run: |
         touch .env
-        echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
-        echo "REACT_APP_BACKEND_ADDRESS=${{ secrets.REACT_APP_BACKEND_ADDRESS }}" >> .env
+        echo "REACT_APP_MONGODB_URI=${{ secrets.REACT_APP_MONGODB_URI }}" >> .env
+        echo "REACT_APP_ADDRESS=${{ secrets.REACT_APP_ADDRESS }}" >> .env
         echo "REACT_APP_SLACK_URI=${{ secrets.REACT_APP_SLACK_URI }}" >> .env
         
         # Build a docker container and
@@ -68,10 +68,10 @@ jobs:
     - name: SSH to EC2 and replace the docker containers
       env:
         PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-        EC2_INSTANCE: ${{ secrets.EC2_INSTANCE }}
+        REACT_APP_ADDRESS: ${{ secrets.REACT_APP_ADDRESS }}
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-        ssh -o StrictHostKeyChecking=no -i private_key $EC2_INSTANCE 'bash -s' < restart.sh $IMAGE
+        ssh -o StrictHostKeyChecking=no -i private_key ubuntu@$REACT_APP_ADDRESS 'bash -s' < restart.sh $IMAGE
 
     - name: Remove Github Actions IP from Security group
       run: |

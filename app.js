@@ -1,4 +1,3 @@
-const config = require('./utils/config')
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
@@ -10,6 +9,9 @@ const middleWare = require('./utils/middleware')
 const mongoose = require('mongoose')
 const cron = require('node-cron')
 const sendToSlack = require('./functions/slack')
+require('dotenv').config()
+
+const mongoUri = process.env.REACT_APP_MONGODB_URI
 
 // At 12 every Monday '0 12 * * 1', at every minute "* * * * *"
 cron.schedule('30 14 * * 4', () => {
@@ -32,7 +34,7 @@ const connectToMongoDB = (path) => {
         })
 }
 
-connectToMongoDB(config.MONGODB_URI);
+connectToMongoDB(mongoUri);
 
 app.use(cors())
 //app.use(express.static(path.join(__dirname, 'public')));
