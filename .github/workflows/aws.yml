@@ -50,6 +50,9 @@ jobs:
         echo "REACT_APP_ADDRESS=${{ secrets.REACT_APP_ADDRESS }}" >> .env
         echo "REACT_APP_SLACK_URI=${{ secrets.REACT_APP_SLACK_URI }}" >> .env
         
+        touch rds-combined-ca-bundle.pem
+        echo "${{ secrets.AWS_DOCUMENTDB_KEY }}" >> rds-combined-ca-bundle.pem
+        
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.

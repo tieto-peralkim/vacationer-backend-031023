@@ -12,7 +12,6 @@
 4. Start frontend
 5. ...
 
-### TO-DO 15.9.
+### TO-DO 21.9.
 1. Creating production version including DocumentDB database
-2. add right user for backend github secret credentials / change github secret credentials to some AWS solution eg?
-3. check AWS settings (cleanups, billing… )
+2. Check AWS settings (cleanups, billing… )
