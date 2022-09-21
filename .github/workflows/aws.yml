@@ -66,7 +66,7 @@ jobs:
 
     - name: Add Github Actions IP to Security group
       run: |
-        aws ec2 authorize-security-group-ingress --group-id sg-04127401a70f9646c --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+        aws ec2 authorize-security-group-ingress --group-id sg-0b06465276d656a09 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
     - name: SSH to EC2 and replace the docker containers
       env:
@@ -78,5 +78,5 @@ jobs:
 
     - name: Remove Github Actions IP from Security group
       run: |
-        aws ec2 revoke-security-group-ingress --group-id sg-04127401a70f9646c --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+        aws ec2 revoke-security-group-ingress --group-id sg-0b06465276d656a09 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
       if: always()
