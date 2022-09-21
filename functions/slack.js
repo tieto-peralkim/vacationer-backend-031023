@@ -32,7 +32,7 @@ const slackMessage = (vacationerAmount, weekList) => {
             }
         )
         .catch((error) => {
-            console.error("There was a timespan get error!", error);
+            console.error("There was a Slack post error!", error);
         })
 }
 
