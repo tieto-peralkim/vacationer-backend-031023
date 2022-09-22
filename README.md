@@ -15,3 +15,4 @@
 ### TO-DO 21.9.
 1. Creating production version including DocumentDB database
 2. Check AWS settings (cleanups, billing… )
+3. Limit the rights of AWS AMS vacationer users to EC2?
