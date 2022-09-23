@@ -12,10 +12,12 @@ const sendToSlack = require('./functions/slack')
 require('dotenv').config()
 
 const mongoUri = process.env.REACT_APP_MONGODB_URI
-
 // At 12 every Monday '0 12 * * 1', at every minute "* * * * *"
-cron.schedule('30 15 * * 5', () => {
-        sendToSlack()
+const cronSchedule='0 12 * * 1'
+
+cron.schedule(cronSchedule, () => {
+    console.log("Sending weekly Slack message, schedule:", cronSchedule)
+    sendToSlack()
     }, {
         timezone: "Europe/Helsinki"
 })
