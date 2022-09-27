@@ -22,8 +22,8 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment:
-      name: development
-      #name: production
+      #name: development
+      name: production
       url: http://vacationer-sandbox.cem.ninja/calendar
 
     steps:
@@ -62,23 +62,23 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-    - name: Public IP of Github Actions
-      id: ip
-      uses: haythem/public-ip@v1.2
-
-    - name: Add Github Actions IP to Security group
-      run: |
-        aws ec2 authorize-security-group-ingress --group-id sg-0b06465276d656a09 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-
-    - name: SSH to EC2 and replace the docker containers
-      env:
-        PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-        REACT_APP_ADDRESS: ${{ secrets.REACT_APP_ADDRESS }}
-      run: |
-        echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-        ssh -o StrictHostKeyChecking=no -i private_key ubuntu@$REACT_APP_ADDRESS 'bash -s' < docker_restart.sh $IMAGE
-
-    - name: Remove Github Actions IP from Security group
-      run: |
-        aws ec2 revoke-security-group-ingress --group-id sg-0b06465276d656a09 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-      if: always()
+#    - name: Public IP of Github Actions
+#      id: ip
+#      uses: haythem/public-ip@v1.2
+#
+#    - name: Add Github Actions IP to Security group
+#      run: |
+#        aws ec2 authorize-security-group-ingress --group-id sg-0b06465276d656a09 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+#
+#    - name: SSH to EC2 and replace the docker containers
+#      env:
+#        PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+#        REACT_APP_ADDRESS: ${{ secrets.REACT_APP_ADDRESS }}
+#      run: |
+#        echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+#        ssh -o StrictHostKeyChecking=no -i private_key ubuntu@$REACT_APP_ADDRESS 'bash -s' < docker_restart.sh $IMAGE
+#
+#    - name: Remove Github Actions IP from Security group
+#      run: |
+#        aws ec2 revoke-security-group-ingress --group-id sg-0b06465276d656a09 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+#      if: always()
