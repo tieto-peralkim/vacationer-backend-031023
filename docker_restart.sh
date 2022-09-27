@@ -11,7 +11,7 @@ docker rm vacationer-"$1";
 echo "Run the new $1 image"
 if [[ "$1" == "backend" ]] ; then
 	ports=3001:3001
-else ports=80:3000
+else ports=80:80
 fi
 docker run -d -p $ports --name=vacationer-"$1" 629517020360.dkr.ecr.eu-west-1.amazonaws.com/ecr-vacationer-"$1":latest
 echo "Docker run done, exiting EC2"
