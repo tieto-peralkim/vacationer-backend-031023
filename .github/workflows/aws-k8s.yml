@@ -51,9 +51,6 @@ jobs:
         touch .env
         echo "REACT_APP_ADDRESS=${{ env.BACKEND_URL }}" >> .env
 
-        touch rds-combined-ca-bundle.pem
-        echo "${{ secrets.AWS_DOCUMENTDB_KEY }}" >> rds-combined-ca-bundle.pem
-
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
