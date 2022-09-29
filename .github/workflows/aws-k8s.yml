@@ -1,0 +1,59 @@
+# This production workflow will build and push a new backend container image to Amazon ECR,
+# when there is a push to the "main" branch.
+#
+
+name: Build image for Amazon ECR with kubernetes configuration
+
+on:
+  push:
+    branches:
+      - "main"
+
+env:
+  AWS_REGION: eu-west-1
+  ECR_REPOSITORY: vacationer-backend-k8s
+  TAG: latest
+  BACKEND_URL: https://vacationer.kube.cem.ninja/api
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: BuildImageToECR
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://vacationer.kube.cem.ninja/api/
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ env.TAG }}
+
+      run: |
+        touch .env
+        echo "REACT_APP_ADDRESS=${{ env.BACKEND_URL }}" >> .env
+
+        touch rds-combined-ca-bundle.pem
+        echo "${{ secrets.AWS_DOCUMENTDB_KEY }}" >> rds-combined-ca-bundle.pem
+
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
