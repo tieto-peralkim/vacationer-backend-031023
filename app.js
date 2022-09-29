@@ -23,6 +23,11 @@ cron.schedule(cronSchedule, () => {
 })
 
 const connectToMongoDB = (path) => {
+    if(!path) {
+        console.log("MongoDB path not found, no database connection")
+        return
+    }
+    console.log("Connecting to mongodb" , path.split("@")[1])
     mongoose.connect(path, {useNewUrlParser: true, useUnifiedTopology: true})
         .then(() => {
             let admin = new mongoose.mongo.Admin(mongoose.connection.db);
