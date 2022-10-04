@@ -5,6 +5,7 @@ const cors = require('cors')
 const vacationsRouter = require('./controllers/vacationers')
 const teamsRouter = require('./controllers/teams')
 const timeframesRouter = require('./controllers/timeframes')
+const slackRouter = require('./controllers/slack')
 const middleWare = require('./utils/middleware')
 const mongoose = require('mongoose')
 const cron = require('node-cron')
@@ -12,7 +13,7 @@ const sendToSlack = require('./functions/slack')
 require('dotenv').config()
 
 const mongoUri = process.env.REACT_APP_MONGODB_URI
-// At 12 every Monday '0 12 * * 1', at every minute "* * * * *"
+// At 12 every Monday '0 12 * * 1'
 const cronSchedule='0 12 * * 1'
 
 cron.schedule(cronSchedule, () => {
@@ -52,6 +53,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(vacationsRouter)
 app.use(teamsRouter)
 app.use(timeframesRouter)
+app.use(slackRouter)
 
 app.use(middleWare.unknownEndpoint)
 app.use(middleWare.errorHandler)
