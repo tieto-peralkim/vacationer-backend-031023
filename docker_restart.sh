@@ -16,7 +16,7 @@ else
   ports=80:80
   envVariables="REACT_APP_ADDRESS=http://34.240.254.109:3001"
 fi
-docker run -d -p $ports -e envVariables --name=vacationer-"$1" 629517020360.dkr.ecr.eu-west-1.amazonaws.com/ecr-vacationer-"$1":latest
+docker run -d -p $ports -e $envVariables --name=vacationer-"$1" 629517020360.dkr.ecr.eu-west-1.amazonaws.com/ecr-vacationer-"$1":latest
 echo "Docker run done, exiting EC2"
 exit
 else
