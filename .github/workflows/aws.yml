@@ -14,8 +14,8 @@ env:
   ECR_REPOSITORY: ecr-vacationer-backend
   IMAGE: backend
   IMAGE_TAG: latest
-  EC2_IP: http://34.240.254.109:3001
   PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+  EC2_IP: http://34.240.254.109:3001
   DOCDB_URI: ${{ secrets.DOCDB_URI }}
   SLACK_URI: ${{ secrets.SLACK_URI }}
 
