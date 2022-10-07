@@ -14,10 +14,7 @@ env:
   ECR_REPOSITORY: ecr-vacationer-backend
   IMAGE: backend
   IMAGE_TAG: latest
-  PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
   EC2_IP: http://34.240.254.109:3001
-  DOCDB_URI: ${{ secrets.DOCDB_URI }}
-  SLACK_URI: ${{ secrets.SLACK_URI }}
 
 permissions:
   contents: read
@@ -66,6 +63,10 @@ jobs:
         aws ec2 authorize-security-group-ingress --group-id sg-0b06465276d656a09 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
     - name: SSH to EC2 and replace the docker containers
+      env:
+        PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+        DOCDB_URI: ${{ secrets.DOCDB_URI }}
+        SLACK_URI: ${{ secrets.SLACK_URI }}
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
         ssh -o StrictHostKeyChecking=no -i private_key ubuntu@34.240.254.109 'bash -s' < docker_restart.sh $IMAGE $EC2_IP $DOCDB_URI $SLACK_URI
