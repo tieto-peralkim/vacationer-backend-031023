@@ -1,9 +1,9 @@
 const slackRouter = require('express').Router()
-const sendToSlack = require('../functions/slack')
+const sendSlackMessage = require('../functions/slack')
 
 // Sends the next week's vacationers to Slack channel
-slackRouter.get('/slack', (req, res, next) => {
-    sendToSlack()
+slackRouter.get('/slackMessageSender', (req, res, next) => {
+    sendSlackMessage()
     res.status(200).send("Slack query sent")
 })
 

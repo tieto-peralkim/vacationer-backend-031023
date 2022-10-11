@@ -9,16 +9,16 @@ const slackRouter = require('./controllers/slack')
 const middleWare = require('./utils/middleware')
 const mongoose = require('mongoose')
 const cron = require('node-cron')
-const sendToSlack = require('./functions/slack')
+const sendSlackMessage = require('./functions/slack')
 require('dotenv').config()
 
 const mongoUri = process.env.REACT_APP_MONGODB_URI
-// At 12 every Monday '0 12 * * 1'
-const cronSchedule='0 12 * * 1'
+// At 12 every Monday -> '0 12 * * 1'
+const cronSchedule='0 23 * * 2'
 
 cron.schedule(cronSchedule, () => {
     console.log("Sending weekly Slack message, schedule:", cronSchedule)
-    sendToSlack()
+    sendSlackMessage()
     }, {
         timezone: "Europe/Helsinki"
 })

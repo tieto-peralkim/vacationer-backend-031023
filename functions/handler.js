@@ -1,9 +1,9 @@
-const fetchVacationsBetween = require("./fetcher.js");
+const fetcher = require("./fetcher.js");
 
 // Creates the array of dates with vacationer numbers
 //https://dev.to/ashikpaul42/how-to-count-occurrences-of-dates-in-an-array-of-date-ranges-javascript-kjo
 async function handleVacationData(start, end) {
-    const holidaysBetweenDates = await fetchVacationsBetween(start, end)
+    const holidaysBetweenDates = await fetcher.fetchVacationsBetween(start, end)
     console.log("holidaysBetweenDates", holidaysBetweenDates)
 
     let holidayTimes = []

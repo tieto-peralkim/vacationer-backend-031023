@@ -1,3 +1,5 @@
+const fetcher = require("./fetcher.js");
+const handleVacationData = require("./handler");
 const axios = require("axios");
 
 const today = new Date();
@@ -28,33 +30,35 @@ const slackMessage = (vacationerAmount, weekList) => {
                 pe ${new Date(weekList[4][0]).toLocaleDateString("fi-FI")}  ${weekList[4][1]} - ${weekList[4][2]}`
     }))
         .then(response => {
-                console.log("Slack message sent:", response.data)
+            console.log("Slack message sent:", response.data)
         })
         .catch((error) => {
             console.error("There was a Slack post error!", error);
         })
 }
 
-const sendToSlack = () => {
+const sendSlackMessage = () => {
     let numberOfVacationers = 0;
     let vacationersPerDay = []
 
-    axios.get(`${process.env.REACT_APP_ADDRESS}/vacationeramount?start=${nextMonday.toISOString()}&end=${nextFriday.toISOString()}`)
+    console.log("nextMonday ", nextMonday)
+    console.log("nextFriday ", nextFriday)
+
+    fetcher.fetchVacationerAmount(nextMonday, nextFriday)
         .then((response) => {
-            numberOfVacationers = response.data.length;
-            axios.get(`${process.env.REACT_APP_ADDRESS}/timespan?start=${nextMonday.toISOString()}&end=${nextFriday.toISOString()}`)
+            numberOfVacationers = response.length
+            handleVacationData(nextMonday, nextFriday)
                 .then((response) => {
-                    console.log("Timespan response", response.data)
-                    vacationersPerDay = response.data;
+                    vacationersPerDay = response
                     slackMessage(numberOfVacationers, vacationersPerDay)
                 })
-                .catch((error) => {
-                    console.error("There was a timespan get error!", error);
+                .catch(error => {
+                    console.error("handleVacationData error: ", error)
                 })
         })
-        .catch((error) => {
-            console.error("There was a vacationeramount get error!", error);
+        .catch(error => {
+            console.error("fetchVacationerAmount error: ", error)
         })
 }
 
-module.exports = sendToSlack
+module.exports = sendSlackMessage
