@@ -10,9 +10,9 @@ echo "Removing old $INSTANCE"
 docker rm vacationer-"$INSTANCE";
 echo "Run the new $INSTANCE image"
 PORTS=3001:3001
-ENV1=(REACT_APP_ADDRESS="$2")
-ENV2="REACT_APP_MONGODB_URI=mongodb://$3@docdb-sandbox.c9qzwnhx4tes.eu-west-1.docdb.amazonaws.com:27017/vacationer-app-database?tls=true&tlsCAFile=rds-combined-ca-bundle.pem&retryWrites=false"
-ENV3=(REACT_APP_SLACK_URI="$4")
+ENV1=(REACT_APP_ADDRESS="$1")
+ENV2="REACT_APP_MONGODB_URI=mongodb://$2@docdb-sandbox.c9qzwnhx4tes.eu-west-1.docdb.amazonaws.com:27017/vacationer-app-database?tls=true&tlsCAFile=rds-combined-ca-bundle.pem&retryWrites=false"
+ENV3=(REACT_APP_SLACK_URI="$3")
 docker run -d -p $PORTS -e "$ENV1" -e "$ENV2" -e "$ENV3" --name=vacationer-"$INSTANCE" 629517020360.dkr.ecr.eu-west-1.amazonaws.com/ecr-vacationer-"$INSTANCE":latest
 echo "Docker $INSTANCE run done, exiting EC2"
 exit
