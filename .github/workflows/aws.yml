@@ -68,7 +68,7 @@ jobs:
         SLACK_URI: ${{ secrets.SLACK_URI }}
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-        ssh -o StrictHostKeyChecking=no -i private_key ubuntu@34.240.254.109 'bash -s --' < docker_backend.sh $EC2_IP $DOCDB_CREDENTIALS $SLACK_URI
+        ssh -o StrictHostKeyChecking=no -i private_key ubuntu@34.240.254.109 'bash -s --' < docker_backend.sh "$EC2_IP" "$DOCDB_CREDENTIALS" "$SLACK_URI"
 
     - name: Remove Github Actions IP from Security group
       run: |
