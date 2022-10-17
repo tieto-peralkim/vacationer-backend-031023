@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: development
-      url: http://vacationer-sandbox.cem.ninja/api/vacationers
+      url: http://vacationer-sandbox.cem.ninja:3001/vacationers
 
     steps:
     - name: Checkout
