@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://vacationer.kube.cem.ninja/api/
+      url: $BACKEND_URL
 
     steps:
     - name: Checkout
