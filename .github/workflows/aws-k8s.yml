@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: $BACKEND_URL
+      url: ${{ env.BACKEND_URL }}
 
     steps:
     - name: Checkout
