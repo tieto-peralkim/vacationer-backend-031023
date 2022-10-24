@@ -14,7 +14,7 @@ require('dotenv').config()
 
 const mongoUri = process.env.REACT_APP_MONGODB_URI
 // At 12 every Monday -> '0 12 * * 1'
-const cronSchedule='0 12 * * 1'
+const cronSchedule='0 13 * * 1'
 
 cron.schedule(cronSchedule, () => {
     console.log("Sending weekly Slack message, schedule:", cronSchedule)

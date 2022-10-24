@@ -2,18 +2,26 @@ const fetcher = require("./fetcher.js");
 const handleVacationData = require("./handler");
 const axios = require("axios");
 
-const today = new Date();
-today.setUTCHours(0, 0, 0)
+let today;
+let nextMonday;
+let nextFriday;
 
-const nextMonday = new Date();
-nextMonday.setUTCDate(
-    today.getUTCDate() + ((1 + 7 - today.getUTCDay()) % 7 || 7)
-);
-nextMonday.setUTCHours(0, 0, 0, 0);
 
-const nextFriday = new Date();
-nextFriday.setTime(nextMonday.getTime() + 4 * 24 * 60 * 60 * 1000);
-nextFriday.setUTCHours(0, 0, 0, 0);
+const getNextWeekDates = () => {
+    today = new Date();
+    today.setUTCHours(0, 0, 0)
+
+    nextMonday = new Date();
+    nextMonday.setUTCDate(
+        today.getUTCDate() + ((1 + 7 - today.getUTCDay()) % 7 || 7)
+    );
+    nextMonday.setUTCHours(0, 0, 0, 0);
+
+    nextFriday = new Date();
+    nextFriday.setTime(nextMonday.getTime() + 4 * 24 * 60 * 60 * 1000);
+    nextFriday.setUTCHours(0, 0, 0, 0);
+}
+
 
 const slackMessage = (vacationerAmount, weekList) => {
     for (let i = 0; i < weekList.length; i++) {
@@ -40,6 +48,8 @@ const slackMessage = (vacationerAmount, weekList) => {
 const sendSlackMessage = () => {
     let numberOfVacationers = 0;
     let vacationersPerDay = []
+
+    getNextWeekDates()
 
     console.log("nextMonday ", nextMonday)
     console.log("nextFriday ", nextFriday)
