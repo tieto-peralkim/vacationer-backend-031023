@@ -1,7 +1,7 @@
 const vacationersRouter = require('express').Router()
 const Vacationer = require('../models/vacationer');
 
-// Get all vacationers and all their data
+// Get all the vacationers with vacations
 vacationersRouter.get('/vacationers', (req, res, next) => {
     Vacationer.find({})
         .then(vacationer => {
@@ -10,7 +10,7 @@ vacationersRouter.get('/vacationers', (req, res, next) => {
         .catch(error => next(error))
 })
 
-// Get all vacationers (name and id)
+// Get name and id of all the vacationers
 vacationersRouter.get('/vacationers/total', (req, res, next) => {
     Vacationer.find({}, {name: 1})
         .then(vacationer => {
@@ -19,6 +19,7 @@ vacationersRouter.get('/vacationers/total', (req, res, next) => {
         .catch(error => next(error))
 })
 
+// Get single vacationer with vacations
 vacationersRouter.get('/vacationers/:vacationerId', (req, res, next) => {
     Vacationer.findById(req.params.vacationerId)
         .then(foundVacationer => {
@@ -35,7 +36,16 @@ vacationersRouter.post('/vacationers', (req, res, next) => {
         .then(savedVacationer => {
             res.status(201).json(savedVacationer)
         })
-        .catch(error => next(error))
+        .catch(error => {
+            console.log(error);
+            console.log("Error code:", error.code);
+            if (error.code === 11000) {
+                res.status(409).json("This username is already taken!")
+            }
+            else {
+                next(error)
+            }
+        })
 })
 
 // Change vacationer name
@@ -54,7 +64,7 @@ vacationersRouter.patch('/vacationers/:vacationerId', (req, res, next) => {
 
 })
 
-// Remove vacationer
+// Delete vacationer
 vacationersRouter.delete('/vacationers/:vacationerId', (req, res, next) => {
     Vacationer.findByIdAndRemove(req.params.vacationerId)
         .then(deletedVacationer => {
@@ -65,7 +75,7 @@ vacationersRouter.delete('/vacationers/:vacationerId', (req, res, next) => {
 
 })
 
-// Add a holiday
+// Add a vacation
 vacationersRouter.post('/vacationers/:vacationerId', (req, res, next) => {
     const vacationerId = req.params.vacationerId;
     const newHoliday = req.body;
@@ -80,7 +90,7 @@ vacationersRouter.post('/vacationers/:vacationerId', (req, res, next) => {
         .catch(error => next(error))
 })
 
-// Replace a holiday (also the _id value)
+// Replace a vacation (also the _id value)
 vacationersRouter.put('/vacationers/:vacationerId/:holidayId', (req, res, next) => {
     console.log("Modifying vacationerId", req.params.vacationerId, "holidayId", req.params.holidayId, "req.body", req.body)
     const vacationerId = req.params.vacationerId;
@@ -98,7 +108,7 @@ vacationersRouter.put('/vacationers/:vacationerId/:holidayId', (req, res, next) 
 
 })
 
-// Delete a holiday
+// Delete a vacation
 vacationersRouter.delete('/vacationers/:vacationerId/:holidayId', (req, res, next) => {
     console.log("Deleting vacationerId", req.params.vacationerId, "holidayId", req.params.holidayId)
     const vacationerId = req.params.vacationerId;

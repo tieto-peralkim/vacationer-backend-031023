@@ -63,7 +63,7 @@ teamsRouter.patch('/teams/:id', (req, res, next) => {
 teamsRouter.put('/teams/membername/:id', (req, res, next) => {
     const memberId = req.params.id;
     const newMemberName = req.body.newName;
-    console.log("nyt muokataan ", memberId, "->", newMemberName)
+    console.log("Modifying ", memberId, "->", newMemberName)
     Team.updateMany( {"members.vacationerId": memberId},
         {
             $set: {
@@ -80,7 +80,7 @@ teamsRouter.put('/teams/membername/:id', (req, res, next) => {
 // Delete a team member from all the teams
 teamsRouter.put('/teams/members/all', (req, res, next) => {
     const memberId = req.body.id;
-    console.log("nyt poistetaan ", req.body.name, ":", memberId)
+    console.log("Deleting ", req.body.name, ":", memberId)
     Team.updateMany( {
         $pull: {
             members: {vacationerId: memberId}

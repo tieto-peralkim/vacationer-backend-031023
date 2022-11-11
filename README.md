@@ -17,7 +17,7 @@ Normal process:
 ```
 npm start
 ```
-- Go to backend API in http://localhost:3001/<ENDPOINT>
+- Consume the API with http://localhost:3001/<ENDPOINT>
 
 ### TO-DO 12.10.
 Limit the rights of AWS AMS vacationer users to EC2?
