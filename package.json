@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "format": "prettier --write \"./**/*.{js,jsx}\"",
     "start": "nodemon server.js"
   },
   "dependencies": {
@@ -20,6 +21,7 @@
     "pug": "2.0.0-beta11"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "prettier": "^2.7.1"
   }
 }

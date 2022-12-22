@@ -1,4 +1,4 @@
-# This workflow will build and push a new backend container image to Amazon ECR and run the container in EC2,
+# This QA workflow will build and push a new backend container image to Amazon ECR and run the container in EC2,
 # when there is a push to the "main" branch.
 #
 
