@@ -8,6 +8,19 @@ const vacationerSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    calendarSettings: [
+        {
+            holidayColor: String,
+            unConfirmedHolidayColor: String,
+            weekendColor: String,
+            weekendHolidayColor: String,
+            holidaySymbol: String,
+            unConfirmedHolidaySymbol: String
+        }
+    ],
+    deletedUser: {
+        type: Boolean
+    },
     vacations: [
         {
             comment: String,
