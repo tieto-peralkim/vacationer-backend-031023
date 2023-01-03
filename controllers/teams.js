@@ -1,8 +1,19 @@
 const teamsRouter = require("express").Router();
 const Team = require("../models/team");
+const Vacationer = require("../models/vacationer");
 
+// Get all the teams (except deletedTeams)
 teamsRouter.get("/teams", (req, res, next) => {
-    Team.find({})
+    Team.find({deletedTeam: {$ne: true}})
+        .then((team) => {
+            res.status(200).json(team);
+        })
+        .catch((error) => next(error));
+});
+
+// Get all the deletedTeams
+teamsRouter.get("/teams/deletedTeams", (req, res, next) => {
+    Team.find({deletedTeam: {$in: [true]}})
         .then((team) => {
             res.status(200).json(team);
         })
@@ -119,7 +130,33 @@ teamsRouter.put("/teams/members/:id", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Delete a team by id
+// Safe delete team (can be returned with /undelete)
+teamsRouter.put("/teams/:id/delete", (req, res, next) => {
+    Team.findByIdAndUpdate(
+        req.params.id,
+        {$set: {deletedTeam: true }},
+        { new: true, runValidators: true, context: "query" }
+    )
+        .then((deletedTeam) => {
+            res.status(200).json(deletedTeam);
+        })
+        .catch((error) => next(error));
+});
+
+// Return deleted team
+teamsRouter.put("/teams/:id/undelete", (req, res, next) => {
+    Team.findByIdAndUpdate(
+        req.params.id,
+        {$set: {deletedTeam: false }},
+        { new: true, runValidators: true, context: "query" }
+    )
+        .then((returnedTeam) => {
+            res.status(200).json(returnedTeam);
+        })
+        .catch((error) => next(error));
+});
+
+// Delete team permanently (can not be returned)
 teamsRouter.delete("/teams/:id", (req, res, next) => {
     Team.findByIdAndRemove(req.params.id)
         .then((deletedTeam) => {

@@ -7,6 +7,9 @@ const teamSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    deletedTeam: {
+        type: Boolean
+    },
     members: [
         {
             name: { type: String },

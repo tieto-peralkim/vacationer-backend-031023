@@ -18,7 +18,7 @@ const vacationerSchema = new mongoose.Schema({
             unConfirmedHolidaySymbol: String
         }
     ],
-    deletedUser: {
+    deletedVacationer: {
         type: Boolean
     },
     vacations: [
