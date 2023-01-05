@@ -18,6 +18,3 @@ Normal process:
 npm start
 ```
 - Consume the API with http://localhost:3001/<ENDPOINT>
-
-### TO-DO 12.10.
-Limit the rights of AWS AMS vacationer users to EC2?
