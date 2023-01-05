@@ -1,27 +1,34 @@
 const mongoose = require("mongoose");
 mongoose.set("useFindAndModify", false);
 
-const teamSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    deletedTeam: {
-        type: Boolean
-    },
-    members: [
-        {
-            name: { type: String },
-            vacationerId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Vacationer",
-                sparse: true,
-            },
-            _id: false,
+const teamSchema = new mongoose.Schema(
+    {
+        title: {
+            type: String,
+            minlength: 3,
+            required: true,
+            unique: true,
         },
-    ],
-});
+        deletedTeam: {
+            type: Boolean,
+        },
+        deletedAt: {
+            type: Date,
+        },
+        members: [
+            {
+                name: { type: String },
+                vacationerId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Vacationer",
+                    sparse: true,
+                },
+                _id: false,
+            },
+        ],
+    },
+    { timestamps: true }
+);
 
 teamSchema.set("toJSON", {
     transform: (document, returnedObject) => {

@@ -12,6 +12,11 @@ async function fetchVacationsBetween(start, end) {
             $match: {
                 $and: [
                     {
+                        deletedVacationer: {
+                            $ne: true,
+                        },
+                    },
+                    {
                         "vacations.end": {
                             $gte: new Date(start),
                         },

@@ -10,17 +10,45 @@ const middleWare = require("./utils/middleware");
 const mongoose = require("mongoose");
 const cron = require("node-cron");
 const sendSlackMessage = require("./functions/slack");
+const remover = require("./functions/remover");
 require("dotenv").config();
 
 const mongoUri = process.env.REACT_APP_MONGODB_URI;
-// At 12 every Monday -> '0 12 * * 1'
-const cronSchedule = "0 13 * * 1";
+
+// At 13 every Monday = "0 13 * * 1"
+const cronSlackSchedule = "0 13 * * 1";
+// Daily = "0 0 * * *"
+const cronRemoveDataSchedule = "0 0 * * *";
 
 cron.schedule(
-    cronSchedule,
+    cronSlackSchedule,
     () => {
-        console.log("Sending weekly Slack message, schedule:", cronSchedule);
+        console.log(
+            "Weekly cron: Sending  Slack message, schedule:",
+            cronSlackSchedule
+        );
         sendSlackMessage();
+    },
+    {
+        timezone: "Europe/Helsinki",
+    }
+);
+
+cron.schedule(
+    cronRemoveDataSchedule,
+    () => {
+        console.log(
+            "Daily cron: Removing vacationers and teams over 1 month old, schedule",
+            cronRemoveDataSchedule
+        );
+        remover
+            .removeDeletableData()
+            .then((response) => {
+                console.log("Done removing data");
+            })
+            .catch((error) => {
+                console.error("removeData error: ", error);
+            });
     },
     {
         timezone: "Europe/Helsinki",

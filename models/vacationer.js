@@ -1,35 +1,42 @@
 const mongoose = require("mongoose");
 mongoose.set("useFindAndModify", false);
 
-const vacationerSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        minlength: 3,
-        required: true,
-        unique: true,
-    },
-    calendarSettings: [
-        {
-            holidayColor: String,
-            unConfirmedHolidayColor: String,
-            weekendColor: String,
-            weekendHolidayColor: String,
-            holidaySymbol: String,
-            unConfirmedHolidaySymbol: String
-        }
-    ],
-    deletedVacationer: {
-        type: Boolean
-    },
-    vacations: [
-        {
-            comment: String,
-            confirmed: Boolean,
-            start: Date,
-            end: Date
+const vacationerSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            minlength: 3,
+            required: true,
+            unique: true,
         },
-    ],
-});
+        calendarSettings: [
+            {
+                _id: false,
+                holidayColor: String,
+                unConfirmedHolidayColor: String,
+                weekendColor: String,
+                weekendHolidayColor: String,
+                holidaySymbol: String,
+                unConfirmedHolidaySymbol: String,
+            },
+        ],
+        deletedVacationer: {
+            type: Boolean,
+        },
+        deletedAt: {
+            type: Date,
+        },
+        vacations: [
+            {
+                comment: String,
+                confirmed: Boolean,
+                start: Date,
+                end: Date,
+            },
+        ],
+    },
+    { timestamps: true }
+); // Adds createdAt and updatedAt fields
 
 vacationerSchema.set("toJSON", {
     transform: (document, returnedObject) => {

@@ -4,7 +4,7 @@ const Vacationer = require("../models/vacationer");
 
 // Get all the teams (except deletedTeams)
 teamsRouter.get("/teams", (req, res, next) => {
-    Team.find({deletedTeam: {$ne: true}})
+    Team.find({ deletedTeam: { $ne: true } })
         .then((team) => {
             res.status(200).json(team);
         })
@@ -13,7 +13,7 @@ teamsRouter.get("/teams", (req, res, next) => {
 
 // Get all the deletedTeams
 teamsRouter.get("/teams/deletedTeams", (req, res, next) => {
-    Team.find({deletedTeam: {$in: [true]}})
+    Team.find({ deletedTeam: { $in: [true] } })
         .then((team) => {
             res.status(200).json(team);
         })
@@ -134,7 +134,7 @@ teamsRouter.put("/teams/members/:id", (req, res, next) => {
 teamsRouter.put("/teams/:id/delete", (req, res, next) => {
     Team.findByIdAndUpdate(
         req.params.id,
-        {$set: {deletedTeam: true }},
+        { $set: { deletedTeam: true }, deletedAt: new Date()  },
         { new: true, runValidators: true, context: "query" }
     )
         .then((deletedTeam) => {
@@ -147,7 +147,7 @@ teamsRouter.put("/teams/:id/delete", (req, res, next) => {
 teamsRouter.put("/teams/:id/undelete", (req, res, next) => {
     Team.findByIdAndUpdate(
         req.params.id,
-        {$set: {deletedTeam: false }},
+        { $set: { deletedTeam: false } },
         { new: true, runValidators: true, context: "query" }
     )
         .then((returnedTeam) => {
