@@ -7,24 +7,21 @@ const vacationerSchema = new mongoose.Schema(
             type: String,
             minlength: 3,
             required: true,
+        },
+        nameId: {
+            type: String,
+            required: true,
             unique: true,
         },
-        calendarSettings: [
-            {
-                _id: false,
-                holidayColor: String,
-                unConfirmedHolidayColor: String,
-                weekendColor: String,
-                weekendHolidayColor: String,
-                holidaySymbol: String,
-                unConfirmedHolidaySymbol: String,
-            },
-        ],
-        deletedVacationer: {
-            type: Boolean,
-        },
-        deletedAt: {
-            type: Date,
+        calendarSettings: {type: Array, default: [{
+                "_id": false,
+                "holidayColor": "#73D8FF",
+                "unConfirmedHolidayColor": "#68CCCA",
+                "weekendColor": "#808080",
+                "weekendHolidayColor": "#CCCCCC",
+                "holidaySymbol": "X",
+                "unConfirmedHolidaySymbol": "Y"
+            }]
         },
         vacations: [
             {
@@ -34,9 +31,12 @@ const vacationerSchema = new mongoose.Schema(
                 end: Date,
             },
         ],
+        deletedAt: {
+            type: Date,
+        },
     },
-    { timestamps: true }
-); // Adds createdAt and updatedAt fields
+    { timestamps: true } // Adds createdAt and updatedAt fields
+);
 
 vacationerSchema.set("toJSON", {
     transform: (document, returnedObject) => {

@@ -1,37 +1,80 @@
 const vacationersRouter = require("express").Router();
 const Vacationer = require("../models/vacationer");
-const remover = require("../functions/remover.js");
-const fetcher = require("../functions/fetcher.js");
 
-// Get all the vacationers (except deletedVacationers) and their vacations
-vacationersRouter.get("/vacationers", (req, res, next) => {
-    Vacationer.find({ deletedVacationer: { $ne: true } })
+// Get all the vacationers (NOT deleted Vacationers) and their vacations
+vacationersRouter.get("/", (req, res, next) => {
+    Vacationer.find({ deletedAt: { $exists: false } })
         .then((vacationer) => {
             res.status(200).json(vacationer);
         })
         .catch((error) => next(error));
 });
 
-// Get all the deletedVacationers and their vacations
-vacationersRouter.get("/vacationers/deletedVacationers", (req, res, next) => {
-    Vacationer.find({ deletedVacationer: { $in: [true] } })
+// Get all the vacationers (also deleted Vacationers) and their vacations
+vacationersRouter.get("/allUsers", (req, res, next) => {
+    Vacationer.find()
         .then((vacationer) => {
             res.status(200).json(vacationer);
         })
         .catch((error) => next(error));
 });
 
-// Get name and id of all the vacationers (except deletedVacationers)
-vacationersRouter.get("/vacationers/total", (req, res, next) => {
-    Vacationer.find({ deletedVacationer: { $ne: true } }, { name: 1 })
+// Get all the deleted Vacationers and their vacations
+vacationersRouter.get("/deleted", (req, res, next) => {
+    Vacationer.find({ deletedAt: { $ne: null } })
         .then((vacationer) => {
             res.status(200).json(vacationer);
+        })
+        .catch((error) => next(error));
+});
+
+// Get name and id of all the vacationers (NOT deleted Vacationers)
+vacationersRouter.get("/total", (req, res, next) => {
+    Vacationer.find({ deletedAt: { $exists: false } }, { name: 1 })
+        .then((vacationer) => {
+            res.status(200).json(vacationer);
+        })
+        .catch((error) => next(error));
+});
+
+// Get single vacationer with name id
+vacationersRouter.get("/getById/:nameId", (req, res, next) => {
+    let newName = req.params.nameId;
+    console.log("newName", newName);
+
+    Vacationer.find({nameId: newName})
+        .then((foundVacationer) => {
+            if (!foundVacationer.length) {
+                console.log("User does not exist, creating a user:", newName);
+
+                let userInfo = {"name": newName, "nameId": newName}
+
+                console.log("userInfo", userInfo);
+                let newUser = new Vacationer(userInfo);
+                console.log("newUser", newUser);
+                newUser.save()
+                    .then((savedVacationer) => {
+                        console.log("savedVacationer", savedVacationer);
+                        return res.status(201).json(savedVacationer);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        console.error("Error code:", error.code);
+                        if (error.code === 11000) {
+                            return res.status(409).json("This username is already taken!");
+                        } else {
+                            next(error);
+                        }
+                    });
+             } else {
+                return res.status(200).json(foundVacationer);
+            }
         })
         .catch((error) => next(error));
 });
 
 // Get single vacationer with vacations
-vacationersRouter.get("/vacationers/:vacationerId", (req, res, next) => {
+vacationersRouter.get("/:vacationerId", (req, res, next) => {
     Vacationer.findById(req.params.vacationerId)
         .then((foundVacationer) => {
             res.status(200).json(foundVacationer);
@@ -40,7 +83,7 @@ vacationersRouter.get("/vacationers/:vacationerId", (req, res, next) => {
 });
 
 // Add a vacationer
-vacationersRouter.post("/vacationers", (req, res, next) => {
+vacationersRouter.post("/", (req, res, next) => {
     const body = req.body;
     const VacationerObject = new Vacationer(body);
     VacationerObject.save()
@@ -59,7 +102,7 @@ vacationersRouter.post("/vacationers", (req, res, next) => {
 });
 
 // Change vacationer name
-vacationersRouter.patch("/vacationers/:vacationerId", (req, res, next) => {
+vacationersRouter.patch("/:vacationerId", (req, res, next) => {
     const userId = req.params.vacationerId;
     const newName = req.body.newName;
 
@@ -78,7 +121,7 @@ vacationersRouter.patch("/vacationers/:vacationerId", (req, res, next) => {
 
 // Change vacationer calendarSettings
 vacationersRouter.patch(
-    "/vacationers/:vacationerId/calendarSettings",
+    "/:vacationerId/calendarSettings",
     (req, res, next) => {
         const userId = req.params.vacationerId;
         const newCalendarSettings = req.body.newCalendarSettings;
@@ -95,11 +138,37 @@ vacationersRouter.patch(
     }
 );
 
+// Add vacationer calendarSettings
+vacationersRouter.post(
+    "/:vacationerId/calendarSettings",
+    (req, res, next) => {
+        const userId = req.params.vacationerId;
+        const newCalendarSettings = req.body;
+        console.log(
+            "Adding newCalendarSettings:",
+            newCalendarSettings,
+            " ",
+            " to vacationerId:",
+            userId
+        );
+
+        Vacationer.findByIdAndUpdate(
+            userId,
+            { $push: { calendarSettings: newCalendarSettings } },
+            { new: true, runValidators: true, context: "query" }
+        )
+            .then((updatedUser) => {
+                res.status(200).json(updatedUser);
+            })
+            .catch((error) => next(error));
+    }
+);
+
 // Safe delete vacationer (can be returned with /undelete)
-vacationersRouter.put("/vacationers/:vacationerId/delete", (req, res, next) => {
+vacationersRouter.put("/:vacationerId/delete", (req, res, next) => {
     Vacationer.findByIdAndUpdate(
         req.params.vacationerId,
-        { $set: { deletedVacationer: true, deletedAt: new Date() } },
+        { $set: { deletedAt: new Date() } },
         { new: true, runValidators: true, context: "query" }
     )
         .then((deletedVacationer) => {
@@ -110,11 +179,11 @@ vacationersRouter.put("/vacationers/:vacationerId/delete", (req, res, next) => {
 
 // Return deleted vacationer
 vacationersRouter.put(
-    "/vacationers/:vacationerId/undelete",
+    "/:vacationerId/undelete",
     (req, res, next) => {
         Vacationer.findByIdAndUpdate(
             req.params.vacationerId,
-            { $set: { deletedVacationer: false } },
+            { $unset: { deletedAt: 1 } },
             { new: true, runValidators: true, context: "query" }
         )
             .then((returnedVacationer) => {
@@ -125,7 +194,7 @@ vacationersRouter.put(
 );
 
 // Delete vacationer permanently (can not be returned)
-vacationersRouter.delete("/vacationers/:vacationerId", (req, res, next) => {
+vacationersRouter.delete("/:vacationerId", (req, res, next) => {
     Vacationer.findByIdAndRemove(req.params.vacationerId)
         .then((deletedVacationer) => {
             console.log("Deleted user", req.params.vacationerId);
@@ -135,7 +204,7 @@ vacationersRouter.delete("/vacationers/:vacationerId", (req, res, next) => {
 });
 
 // Add a vacation
-vacationersRouter.post("/vacationers/:vacationerId", (req, res, next) => {
+vacationersRouter.post("/:vacationerId", (req, res, next) => {
     const vacationerId = req.params.vacationerId;
     const newHoliday = req.body;
 
@@ -160,7 +229,7 @@ vacationersRouter.post("/vacationers/:vacationerId", (req, res, next) => {
 
 // Replace a vacation (also the _id value)
 vacationersRouter.put(
-    "/vacationers/:vacationerId/:holidayId",
+    "/:vacationerId/:holidayId",
     (req, res, next) => {
         console.log(
             "Modifying vacationerId",
@@ -188,7 +257,7 @@ vacationersRouter.put(
 
 // Delete a vacation
 vacationersRouter.delete(
-    "/vacationers/:vacationerId/:holidayId",
+    "/:vacationerId/:holidayId",
     (req, res, next) => {
         console.log(
             "Deleting vacationerId",
