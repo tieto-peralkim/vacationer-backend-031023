@@ -28,7 +28,7 @@ const checkAuthentication = (req, res, next) => {
         let decodedUser;
 
         try {
-            jwt.verify(authCookie, process.env.REACT_APP_TOKEN_SECRET, (err, user) => {
+            jwt.verify(authCookie, process.env.REACT_APP_JWT_SECRET, (err, user) => {
                 if (err) {
                     console.log(err);
                     res.statusMessage = "Token error";

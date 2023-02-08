@@ -7,10 +7,10 @@ require("dotenv").config();
 const app = express();
 app.use(cookieParser())
 
-const allowList = [process.env.REACT_APP_IP_LOCAL, process.env.REACT_APP_IP_QA, process.env.REACT_APP_IP_PROD]
+const allowedIP = process.env.REACT_APP_FRONT_ADDRESS;
 
 app.use(cors({
-    origin: allowList,
+    origin: allowedIP,
     credentials: true
 }));
 

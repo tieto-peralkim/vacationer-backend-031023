@@ -3,27 +3,16 @@ const loginRouter = require("express").Router();
 require("dotenv").config();
 const jwt = require('jsonwebtoken')
 
-const clientId = process.env.REACT_APP_CLIENT_ID;
-const clientSecret = process.env.REACT_APP_CLIENT_SECRET;
-let access_token;
-let username;
-const selectedScope="read:org";
-const expireInDays = 7;
-const ORGANISATION_NAME='tieto-cem';
-const secret = process.env.REACT_APP_TOKEN_SECRET;
-let requestUrlLogIn;
+const clientId = process.env.REACT_APP_GHUB_ID;
+const clientSecret = process.env.REACT_APP_GHUB_SECRET;
+const secret = process.env.REACT_APP_JWT_SECRET;
+const frontUrl = process.env.REACT_APP_FRONT_ADDRESS;
 
-loginRouter.get("/logout", (req, res) => {
-    let requestUrlLogOut=req.get("Referrer");
-    res.clearCookie("payload");
-    res.clearCookie("header-signature");
-    console.log("requestUrlLogOut: ", requestUrlLogOut);
-    return res.redirect(302, `${requestUrlLogOut}`);
-})
+const ORGANISATION_NAME='tieto-cem';
+const selectedScope="read:org";
+const EXPIRATIONDAYS = 7;
 
 loginRouter.get("/auth", (req, res) => {
-    requestUrlLogIn=req.get("Referrer");
-    console.log("requestUrlLogIn: ", requestUrlLogIn);
     res.redirect(`https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${selectedScope}`)
 })
 
@@ -38,62 +27,62 @@ loginRouter.get("/callback", (req, res, next) => {
             },
     })
         .then((response) => {
-            access_token = response.data.access_token;
-            res.redirect(`/success`);
-        })
-        .catch((error) => next(error));
-})
-
-loginRouter.get("/success", function(req, res) {
-    axios({
-        method: 'get',
-        url: `https://api.github.com/user`,
-        headers: {
-            Authorization: `Bearer ${access_token}`
-        },
-    })
-        .then(response => {
-            username = {username: response.data.login};
+            let access_token=response.data.access_token
+            console.log(access_token);
             axios({
                 method: 'get',
-                url: `https://api.github.com/user/orgs`,
+                url: `https://api.github.com/user`,
                 headers: {
                     Authorization: `Bearer ${access_token}`
                 },
             })
                 .then(response => {
-                    // console.log("organisation", response.data);
-                    let rightOrganization=false;
-                    //poista
-                    rightOrganization=true;
+                    let username = {username: response.data.login};
+                    axios({
+                        method: 'get',
+                        url: `https://api.github.com/user/orgs`,
+                        headers: {
+                            Authorization: `Bearer ${access_token}`
+                        },
+                    })
+                        .then(response => {
+                            let rightOrganization=false;
 
-                    for (let i = 0; i < response.data.length; i++){
-                        if(response.data[i].login === ORGANISATION_NAME){
-                            rightOrganization=true;
-                        }
-                    }
-                    if (rightOrganization) {
-                        jwt.sign(username, secret, { expiresIn: `${expireInDays}d` }, (err, token) => {
-                            let [header, payload, signature] = token.split('.');
-                            console.log("header", header, "PL", payload, "signature", signature);
-                            res.cookie("payload", { payload }, {
-                                expires: new Date(Date.now() + expireInDays*86400*1000),
-                                httpOnly: false,
-                                sameSite: "strict"
-                            })
-                            res.cookie("header-signature", { header, signature}, {
-                                expires: new Date(Date.now() + expireInDays*86400*1000),
-                                httpOnly: true,
-                                sameSite: "strict"
-                            })
-                            return res.redirect(302, `${requestUrlLogIn}`)
+                            for (let i = 0; i < response.data.length; i++){
+                                if(response.data[i].login === ORGANISATION_NAME){
+                                    rightOrganization=true;
+                                }
+                            }
+                            if (rightOrganization) {
+                                jwt.sign(username, secret, { expiresIn: `${EXPIRATIONDAYS}d` }, (err, token) => {
+                                    let [header, payload, signature] = token.split('.');
+                                    console.log("header", header, "PL", payload, "signature", signature);
+                                    res.cookie("payload", { payload }, {
+                                        expires: new Date(Date.now() + EXPIRATIONDAYS*86400*1000),
+                                        httpOnly: false,
+                                        sameSite: "strict"
+                                    })
+                                    res.cookie("header-signature", { header, signature}, {
+                                        expires: new Date(Date.now() + EXPIRATIONDAYS*86400*1000),
+                                        httpOnly: true,
+                                        sameSite: "strict"
+                                    })
+                                    return res.redirect(302, `${frontUrl}/`)
+                                })
+                            } else {
+                                return res.redirect(302, `${frontUrl}/loginFailed`);
+                            }
                         })
-                    } else {
-                        return res.redirect(302, `${requestUrlLogIn}loginFailed`);
-                    }
                 })
         })
+        .catch((error) => next(error));
+
 })
 
+loginRouter.get("/logout", (req, res) => {
+    res.clearCookie("payload");
+    res.clearCookie("header-signature");
+    return res.redirect(302, `${frontUrl}/`);
+})
 
 module.exports = loginRouter;

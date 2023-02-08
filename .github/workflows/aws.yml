@@ -60,14 +60,18 @@ jobs:
       run: |
         aws ec2 authorize-security-group-ingress --group-id sg-0b06465276d656a09 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
-    - name: SSH to EC2 and replace the docker containers
+    - name: SSH to EC2, add env variables and replace the docker containers
       env:
         PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
         DOCDB_CREDENTIALS: ${{ secrets.DOCDB_CREDENTIALS }}
         SLACK_URI: ${{ secrets.SLACK_URI }}
+        GHUB_ID: ${{ secrets.GHUB_ID }}
+        GHUB_SECRET : ${{ secrets.GHUB_SECRET }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        FRONT_ADDRESS: ${{ secrets.FRONT_ADDRESS }}
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-        ssh -o StrictHostKeyChecking=no -i private_key ubuntu@34.240.254.109 'bash -s --' < docker_backend.sh $DOCDB_CREDENTIALS $SLACK_URI
+        ssh -o StrictHostKeyChecking=no -i private_key ubuntu@34.240.254.109 'bash -s --' < docker_backend.sh $DOCDB_CREDENTIALS $SLACK_URI $GHUB_ID $GHUB_SECRET $JWT_SECRET $FRONT_ADDRESS
 
     - name: Remove Github Actions IP from Security group
       run: |
