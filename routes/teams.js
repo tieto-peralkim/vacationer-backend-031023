@@ -1,9 +1,8 @@
 const teamsRouter = require("express").Router();
 const Team = require("../models/team");
-const Vacationer = require("../models/vacationer");
 
 // Get all the teams (except deletedTeams)
-teamsRouter.get("/teams", (req, res, next) => {
+teamsRouter.get("/", (req, res, next) => {
     Team.find({ deletedTeam: { $ne: true } })
         .then((team) => {
             res.status(200).json(team);
@@ -12,7 +11,7 @@ teamsRouter.get("/teams", (req, res, next) => {
 });
 
 // Get all the deletedTeams
-teamsRouter.get("/teams/deletedTeams", (req, res, next) => {
+teamsRouter.get("/deleted", (req, res, next) => {
     Team.find({ deletedTeam: { $in: [true] } })
         .then((team) => {
             res.status(200).json(team);
@@ -21,7 +20,7 @@ teamsRouter.get("/teams/deletedTeams", (req, res, next) => {
 });
 
 // Add a new team
-teamsRouter.post("/teams", (req, res, next) => {
+teamsRouter.post("/", (req, res, next) => {
     const body = req.body;
     console.log("body", body);
     const TeamObject = new Team(body);
@@ -32,7 +31,7 @@ teamsRouter.post("/teams", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-teamsRouter.get("/teams/:id", (req, res, next) => {
+teamsRouter.get("/:id", (req, res, next) => {
     Team.findById(req.params.id)
         .then((foundTeam) => {
             res.status(200).json(foundTeam);
@@ -41,7 +40,7 @@ teamsRouter.get("/teams/:id", (req, res, next) => {
 });
 
 // Add a new member (vacationer) to team
-teamsRouter.post("/teams/:id", (req, res, next) => {
+teamsRouter.post("/:id", (req, res, next) => {
     const teamId = req.params.id;
     const newMember = { name: req.body.name, vacationerId: req.body.id };
 
@@ -59,7 +58,7 @@ teamsRouter.post("/teams/:id", (req, res, next) => {
 });
 
 // Change team name
-teamsRouter.patch("/teams/:id", (req, res, next) => {
+teamsRouter.patch("/:id", (req, res, next) => {
     const teamId = req.params.id;
     const newName = req.body.newName;
 
@@ -77,10 +76,10 @@ teamsRouter.patch("/teams/:id", (req, res, next) => {
 });
 
 // Change name of a team member in all the teams
-teamsRouter.put("/teams/membername/:id", (req, res, next) => {
+teamsRouter.put("/membername/:id", (req, res, next) => {
     const memberId = req.params.id;
     const newMemberName = req.body.newName;
-    console.log("Modifying ", memberId, "->", newMemberName);
+    console.log("Modifying team member name", memberId, "->", newMemberName);
     Team.updateMany(
         { "members.vacationerId": memberId },
         {
@@ -97,7 +96,7 @@ teamsRouter.put("/teams/membername/:id", (req, res, next) => {
 });
 
 // Delete a team member from all the teams
-teamsRouter.put("/teams/members/all", (req, res, next) => {
+teamsRouter.put("/members/all", (req, res, next) => {
     const memberId = req.body.id;
     console.log("Deleting ", req.body.name, ":", memberId);
     Team.updateMany({
@@ -112,7 +111,7 @@ teamsRouter.put("/teams/members/all", (req, res, next) => {
 });
 
 // Delete a team member from specific team
-teamsRouter.put("/teams/members/:id", (req, res, next) => {
+teamsRouter.put("/members/:id", (req, res, next) => {
     const teamId = req.params.id;
     const memberId = req.body.vacationerId;
     console.log("IDs", teamId, memberId);
@@ -131,20 +130,22 @@ teamsRouter.put("/teams/members/:id", (req, res, next) => {
 });
 
 // Safe delete team (can be returned with /undelete)
-teamsRouter.put("/teams/:id/delete", (req, res, next) => {
+teamsRouter.put("/:id/delete",(req, res, next) => {
+    console.log("deleting", req.params.id);
     Team.findByIdAndUpdate(
         req.params.id,
         { $set: { deletedTeam: true }, deletedAt: new Date()  },
         { new: true, runValidators: true, context: "query" }
     )
         .then((deletedTeam) => {
+            console.log("delete", deletedTeam);
             res.status(200).json(deletedTeam);
         })
         .catch((error) => next(error));
 });
 
 // Return deleted team
-teamsRouter.put("/teams/:id/undelete", (req, res, next) => {
+teamsRouter.put("/:id/undelete", (req, res, next) => {
     Team.findByIdAndUpdate(
         req.params.id,
         { $set: { deletedTeam: false } },
@@ -157,7 +158,7 @@ teamsRouter.put("/teams/:id/undelete", (req, res, next) => {
 });
 
 // Delete team permanently (can not be returned)
-teamsRouter.delete("/teams/:id", (req, res, next) => {
+teamsRouter.delete("/:id", (req, res, next) => {
     Team.findByIdAndRemove(req.params.id)
         .then((deletedTeam) => {
             res.status(200).json(deletedTeam);

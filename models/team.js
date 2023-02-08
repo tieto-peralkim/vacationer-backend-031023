@@ -27,7 +27,7 @@ const teamSchema = new mongoose.Schema(
             },
         ],
     },
-    { timestamps: true }
+    { timestamps: true } // Adds createdAt and updatedAt fields
 );
 
 teamSchema.set("toJSON", {

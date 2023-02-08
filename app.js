@@ -1,24 +1,47 @@
 const express = require("express");
 const morgan = require("morgan");
-const app = express();
 const cors = require("cors");
-const vacationsRouter = require("./controllers/vacationers");
-const teamsRouter = require("./controllers/teams");
-const timeframesRouter = require("./controllers/timeframes");
-const slackRouter = require("./controllers/slack");
-const middleWare = require("./utils/middleware");
-const mongoose = require("mongoose");
-const cron = require("node-cron");
-const sendSlackMessage = require("./functions/slack");
-const remover = require("./functions/remover");
+const cookieParser = require('cookie-parser')
 require("dotenv").config();
 
+const app = express();
+app.use(cookieParser())
+
+const allowedIP = process.env.REACT_APP_FRONT_ADDRESS;
+
+app.use(cors({
+    origin: allowedIP,
+    credentials: true
+}));
+
+require("./routes/api")(app)
+
+const middleWare = require("./utils/middleware");
+const sendSlackMessage = require("./functions/slack");
+const remover = require("./functions/remover");
+
+const mongoose = require("mongoose");
+const cron = require("node-cron");
 const mongoUri = process.env.REACT_APP_MONGODB_URI;
+
+app.use(morgan("dev"));
+app.use(express.urlencoded({ extended: false }));
+
+app.use(middleWare.unknownEndpoint);
+app.use(middleWare.errorHandler);
+
+const http = require("http");
+
+const server = http.createServer(app);
+
+server.listen(3001, () => {
+    console.log(`Server running on port 3001`);
+});
 
 // At 13 every Monday = "0 13 * * 1"
 const cronSlackSchedule = "0 13 * * 1";
-// Daily = "0 0 * * *"
-const cronRemoveDataSchedule = "0 0 * * *";
+// Daily at 3 am = "0 3 * * *"
+const cronRemoveDataSchedule = "0 3 * * *";
 
 cron.schedule(
     cronSlackSchedule,
@@ -77,18 +100,3 @@ const connectToMongoDB = (path) => {
 
 connectToMongoDB(mongoUri);
 
-app.use(cors());
-//app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
-app.use(morgan("dev"));
-app.use(express.urlencoded({ extended: false }));
-
-app.use(vacationsRouter);
-app.use(teamsRouter);
-app.use(timeframesRouter);
-app.use(slackRouter);
-
-app.use(middleWare.unknownEndpoint);
-app.use(middleWare.errorHandler);
-
-module.exports = app;

@@ -7,6 +7,7 @@ timeframesRouter.get("/holidaysbetween", (req, res, next) => {
     let start = req.query.start;
     let end = req.query.end;
     console.log("holidaysbetween:", start, "-", end);
+
     fetcher
         .fetchVacationsBetween(start, end)
         .then((vacationer) => {
