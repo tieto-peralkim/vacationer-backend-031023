@@ -18,14 +18,17 @@ const errorHandler = (error, req, res, next) => {
 };
 
 const checkAuthentication = (req, res, next) => {
+    console.log("Authenticating, req", req);
+    console.log("Authenticating, req.cookies", req.cookies);
+
     if (!req.cookies["payload"] || !req.cookies["header-signature"]) {
         res.statusMessage = "Not allowed!";
         res.status(401).end();
     }
     else {
-        // console.log("Authenticated, req.cookies", req.cookies);
         const authCookie = req.cookies["header-signature"].header + "." + req.cookies["payload"].payload + "." + req.cookies["header-signature"].signature;
         let decodedUser;
+        console.log("Authenticated, req.cookies", req.cookies);
 
         try {
             jwt.verify(authCookie, process.env.REACT_APP_JWT_SECRET, (err, user) => {
