@@ -9,6 +9,7 @@ const teamSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
+        // TODO: remove this variable
         deletedTeam: {
             type: Boolean,
         },

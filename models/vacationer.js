@@ -8,6 +8,7 @@ const vacationerSchema = new mongoose.Schema(
             minlength: 3,
             required: true,
         },
+        // Github user name
         nameId: {
             type: String,
             required: true,
