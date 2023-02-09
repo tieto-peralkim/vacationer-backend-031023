@@ -28,7 +28,6 @@ loginRouter.get("/callback", (req, res, next) => {
     })
         .then((response) => {
             let access_token=response.data.access_token
-            console.log(access_token);
             axios({
                 method: 'get',
                 url: `https://api.github.com/user`,
@@ -56,7 +55,6 @@ loginRouter.get("/callback", (req, res, next) => {
                             if (rightOrganization) {
                                 jwt.sign(username, secret, { expiresIn: `${EXPIRATIONDAYS}d` }, (err, token) => {
                                     let [header, payload, signature] = token.split('.');
-                                    console.log("header", header, "PL", payload, "signature", signature);
                                     res.cookie("payload", { payload }, {
                                         expires: new Date(Date.now() + EXPIRATIONDAYS*86400*1000),
                                         httpOnly: false,
