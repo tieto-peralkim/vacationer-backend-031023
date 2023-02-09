@@ -18,7 +18,6 @@ const errorHandler = (error, req, res, next) => {
 };
 
 const checkAuthentication = (req, res, next) => {
-    console.log("Authenticating, req", req);
     console.log("Authenticating, req.cookies", req.cookies);
 
     if (!req.cookies["payload"] || !req.cookies["header-signature"]) {
