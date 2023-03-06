@@ -65,7 +65,7 @@ loginRouter.get("/callback", (req, res, next) => {
                                         expires: new Date(Date.now() + EXPIRATIONDAYS*86400*1000),
                                         httpOnly: true,
                                         // sameSite: "strict"
-                                        sameSite: "none"
+                                        sameSite: "lax"
                                     })
                                     return res.redirect(302, `${frontUrl}/`)
                                 })
