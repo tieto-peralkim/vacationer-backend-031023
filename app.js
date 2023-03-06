@@ -9,10 +9,12 @@ app.use(cookieParser())
 
 const allowedIP = process.env.REACT_APP_FRONT_ADDRESS;
 
-app.use(cors({
+const corsConfig = {
     origin: allowedIP,
     credentials: true
-}));
+}
+
+app.use(cors(corsConfig));
 
 require("./routes/api")(app)
 
