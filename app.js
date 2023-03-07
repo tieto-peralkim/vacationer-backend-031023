@@ -10,7 +10,8 @@ app.use(cookieParser())
 const allowedIP = process.env.REACT_APP_FRONT_ADDRESS;
 
 const corsConfig = {
-    origin: allowedIP,
+    origin: "*",
+    // origin: allowedIP,
     credentials: true
 }
 
