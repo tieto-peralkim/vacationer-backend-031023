@@ -65,11 +65,6 @@ loginRouter.get("/callback", (req, res, next) => {
                                         httpOnly: true,
                                         sameSite: "strict"
                                     })
-
-                                    res.setHeader('Access-Control-Allow-Origin', process.env.REACT_APP_FRONT_ADDRESS);
-                                    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-                                    res.setHeader('Access-Control-Allow-Headers', '*');
-                                    res.setHeader('Access-Control-Allow-Credentials', 'true');
                                     return res.redirect(302, `${frontUrl}/`)
                                 })
                             } else {
