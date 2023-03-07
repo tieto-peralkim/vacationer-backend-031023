@@ -58,14 +58,12 @@ loginRouter.get("/callback", (req, res, next) => {
                                     res.cookie("payload", { payload }, {
                                         expires: new Date(Date.now() + EXPIRATIONDAYS*86400*1000),
                                         httpOnly: false,
-                                        // sameSite: "strict"
-                                        sameSite: "lax"
+                                        sameSite: "strict"
                                     })
                                     res.cookie("header-signature", { header, signature}, {
                                         expires: new Date(Date.now() + EXPIRATIONDAYS*86400*1000),
                                         httpOnly: true,
-                                        // sameSite: "strict"
-                                        sameSite: "lax"
+                                        sameSite: "strict"
                                     })
                                     return res.redirect(302, `${frontUrl}/`)
                                 })
