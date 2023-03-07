@@ -9,11 +9,11 @@ const secret = process.env.REACT_APP_JWT_SECRET;
 const frontUrl = process.env.REACT_APP_FRONT_ADDRESS;
 
 const ORGANISATION_NAME='tieto-cem';
-const selectedScope="read:org";
+const SELECTEDSCOPE="read:org";
 const EXPIRATIONDAYS = 7;
 
 loginRouter.get("/auth", (req, res) => {
-    res.redirect(`https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${selectedScope}`)
+    res.redirect(`https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${SELECTEDSCOPE}`)
 })
 
 loginRouter.get("/callback", (req, res, next) => {
