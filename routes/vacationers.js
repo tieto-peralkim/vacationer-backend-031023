@@ -42,17 +42,18 @@ vacationersRouter.get("/getById/:nameId", (req, res, next) => {
     let newName = req.params.nameId;
     console.log("newName", newName);
 
-    Vacationer.find({nameId: newName})
+    Vacationer.find({ nameId: newName })
         .then((foundVacationer) => {
             if (!foundVacationer.length) {
                 console.log("User does not exist, creating a user:", newName);
 
-                let userInfo = {"name": newName, "nameId": newName}
+                let userInfo = { name: newName, nameId: newName };
 
                 console.log("userInfo", userInfo);
                 let newUser = new Vacationer(userInfo);
                 console.log("newUser", newUser);
-                newUser.save()
+                newUser
+                    .save()
                     .then((savedVacationer) => {
                         console.log("savedVacationer", savedVacationer);
                         return res.status(201).json(savedVacationer);
@@ -61,12 +62,14 @@ vacationersRouter.get("/getById/:nameId", (req, res, next) => {
                         console.error(error);
                         console.error("Error code:", error.code);
                         if (error.code === 11000) {
-                            return res.status(409).json("This username is already taken!");
+                            return res
+                                .status(409)
+                                .json("This username is already taken!");
                         } else {
                             next(error);
                         }
                     });
-             } else {
+            } else {
                 return res.status(200).json(foundVacationer);
             }
         })
@@ -120,49 +123,59 @@ vacationersRouter.patch("/:vacationerId", (req, res, next) => {
 });
 
 // Change vacationer calendarSettings
-vacationersRouter.patch(
-    "/:vacationerId/calendarSettings",
-    (req, res, next) => {
-        const userId = req.params.vacationerId;
-        const newCalendarSettings = req.body.newCalendarSettings;
+vacationersRouter.patch("/:vacationerId/calendarSettings", (req, res, next) => {
+    const userId = req.params.vacationerId;
+    const newCalendarSettings = req.body.newCalendarSettings;
 
-        Vacationer.findByIdAndUpdate(
-            userId,
-            { $set: { calendarSettings: newCalendarSettings } },
-            { new: true, runValidators: true, context: "query" }
-        )
-            .then((updatedUser) => {
-                res.status(200).json(updatedUser);
-            })
-            .catch((error) => next(error));
-    }
-);
+    Vacationer.findByIdAndUpdate(
+        userId,
+        { $set: { calendarSettings: newCalendarSettings } },
+        { new: true, runValidators: true, context: "query" }
+    )
+        .then((updatedUser) => {
+            res.status(200).json(updatedUser);
+        })
+        .catch((error) => next(error));
+});
+
+// Add or remove admin role of vacationer
+vacationersRouter.patch("/:vacationerId/admin", (req, res, next) => {
+    const userId = req.params.vacationerId;
+    const adminRole = req.body.adminRole;
+
+    Vacationer.findByIdAndUpdate(
+        userId,
+        { $set: { admin: adminRole } },
+        { new: true, runValidators: true, context: "query" }
+    )
+        .then((updatedUser) => {
+            res.status(200).json(updatedUser);
+        })
+        .catch((error) => next(error));
+});
 
 // Add vacationer calendarSettings
-vacationersRouter.post(
-    "/:vacationerId/calendarSettings",
-    (req, res, next) => {
-        const userId = req.params.vacationerId;
-        const newCalendarSettings = req.body;
-        console.log(
-            "Adding newCalendarSettings:",
-            newCalendarSettings,
-            " ",
-            " to vacationerId:",
-            userId
-        );
+vacationersRouter.post("/:vacationerId/calendarSettings", (req, res, next) => {
+    const userId = req.params.vacationerId;
+    const newCalendarSettings = req.body;
+    console.log(
+        "Adding newCalendarSettings:",
+        newCalendarSettings,
+        " ",
+        " to vacationerId:",
+        userId
+    );
 
-        Vacationer.findByIdAndUpdate(
-            userId,
-            { $push: { calendarSettings: newCalendarSettings } },
-            { new: true, runValidators: true, context: "query" }
-        )
-            .then((updatedUser) => {
-                res.status(200).json(updatedUser);
-            })
-            .catch((error) => next(error));
-    }
-);
+    Vacationer.findByIdAndUpdate(
+        userId,
+        { $push: { calendarSettings: newCalendarSettings } },
+        { new: true, runValidators: true, context: "query" }
+    )
+        .then((updatedUser) => {
+            res.status(200).json(updatedUser);
+        })
+        .catch((error) => next(error));
+});
 
 // Safe delete vacationer (can be returned with /undelete)
 vacationersRouter.put("/:vacationerId/delete", (req, res, next) => {
@@ -178,20 +191,17 @@ vacationersRouter.put("/:vacationerId/delete", (req, res, next) => {
 });
 
 // Return deleted vacationer
-vacationersRouter.put(
-    "/:vacationerId/undelete",
-    (req, res, next) => {
-        Vacationer.findByIdAndUpdate(
-            req.params.vacationerId,
-            { $unset: { deletedAt: 1 } },
-            { new: true, runValidators: true, context: "query" }
-        )
-            .then((returnedVacationer) => {
-                res.status(200).json(returnedVacationer);
-            })
-            .catch((error) => next(error));
-    }
-);
+vacationersRouter.put("/:vacationerId/undelete", (req, res, next) => {
+    Vacationer.findByIdAndUpdate(
+        req.params.vacationerId,
+        { $unset: { deletedAt: 1 } },
+        { new: true, runValidators: true, context: "query" }
+    )
+        .then((returnedVacationer) => {
+            res.status(200).json(returnedVacationer);
+        })
+        .catch((error) => next(error));
+});
 
 // Delete vacationer permanently (can not be returned)
 vacationersRouter.delete("/:vacationerId", (req, res, next) => {
@@ -228,59 +238,53 @@ vacationersRouter.post("/:vacationerId", (req, res, next) => {
 });
 
 // Replace a vacation (also the _id value)
-vacationersRouter.put(
-    "/:vacationerId/:holidayId",
-    (req, res, next) => {
-        console.log(
-            "Modifying vacationerId",
-            req.params.vacationerId,
-            "holidayId",
-            req.params.holidayId,
-            "req.body",
-            req.body
-        );
-        const vacationerId = req.params.vacationerId;
-        const holidayId = req.params.holidayId;
-        const modifiedHoliday = req.body;
+vacationersRouter.put("/:vacationerId/:holidayId", (req, res, next) => {
+    console.log(
+        "Modifying vacationerId",
+        req.params.vacationerId,
+        "holidayId",
+        req.params.holidayId,
+        "req.body",
+        req.body
+    );
+    const vacationerId = req.params.vacationerId;
+    const holidayId = req.params.holidayId;
+    const modifiedHoliday = req.body;
 
-        Vacationer.updateOne(
-            { _id: vacationerId, "vacations._id": holidayId },
-            { $set: { "vacations.$": modifiedHoliday } }
-        )
-            .then((changedHoliday) => {
-                console.log("Modified holiday", req.params.id);
-                res.status(200).json(changedHoliday);
-            })
-            .catch((error) => next(error));
-    }
-);
+    Vacationer.updateOne(
+        { _id: vacationerId, "vacations._id": holidayId },
+        { $set: { "vacations.$": modifiedHoliday } }
+    )
+        .then((changedHoliday) => {
+            console.log("Modified holiday", req.params.id);
+            res.status(200).json(changedHoliday);
+        })
+        .catch((error) => next(error));
+});
 
 // Delete a vacation
-vacationersRouter.delete(
-    "/:vacationerId/:holidayId",
-    (req, res, next) => {
-        console.log(
-            "Deleting vacationerId",
-            req.params.vacationerId,
-            "holidayId",
-            req.params.holidayId
-        );
-        const vacationerId = req.params.vacationerId;
-        const holidayId = req.params.holidayId;
-        Vacationer.updateOne(
-            { _id: vacationerId },
-            {
-                $pull: {
-                    vacations: { _id: holidayId },
-                },
-            }
-        )
-            .then((deletedHoliday) => {
-                console.log("Deleted holiday", req.params.id);
-                res.status(200).json(deletedHoliday);
-            })
-            .catch((error) => next(error));
-    }
-);
+vacationersRouter.delete("/:vacationerId/:holidayId", (req, res, next) => {
+    console.log(
+        "Deleting vacationerId",
+        req.params.vacationerId,
+        "holidayId",
+        req.params.holidayId
+    );
+    const vacationerId = req.params.vacationerId;
+    const holidayId = req.params.holidayId;
+    Vacationer.updateOne(
+        { _id: vacationerId },
+        {
+            $pull: {
+                vacations: { _id: holidayId },
+            },
+        }
+    )
+        .then((deletedHoliday) => {
+            console.log("Deleted holiday", req.params.id);
+            res.status(200).json(deletedHoliday);
+        })
+        .catch((error) => next(error));
+});
 
 module.exports = vacationersRouter;

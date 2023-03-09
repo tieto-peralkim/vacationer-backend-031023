@@ -3,6 +3,7 @@ mongoose.set("useFindAndModify", false);
 
 const vacationerSchema = new mongoose.Schema(
     {
+        // Name to show in UI
         name: {
             type: String,
             minlength: 3,
@@ -14,15 +15,24 @@ const vacationerSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
-        calendarSettings: {type: Array, default: [{
-                "_id": false,
-                "holidayColor": "#73D8FF",
-                "unConfirmedHolidayColor": "#68CCCA",
-                "weekendColor": "#808080",
-                "weekendHolidayColor": "#CCCCCC",
-                "holidaySymbol": "X",
-                "unConfirmedHolidaySymbol": "Y"
-            }]
+        admin: {
+            type: Boolean,
+            default: false,
+            required: true,
+        },
+        calendarSettings: {
+            type: Array,
+            default: [
+                {
+                    _id: false,
+                    holidayColor: "#73D8FF",
+                    unConfirmedHolidayColor: "#68CCCA",
+                    weekendColor: "#808080",
+                    weekendHolidayColor: "#CCCCCC",
+                    holidaySymbol: "X",
+                    unConfirmedHolidaySymbol: "Y",
+                },
+            ],
         },
         vacations: [
             {
@@ -36,7 +46,8 @@ const vacationerSchema = new mongoose.Schema(
             type: Date,
         },
     },
-    { timestamps: true } // Adds createdAt and updatedAt fields
+    // Adds createdAt and updatedAt fields
+    { timestamps: true }
 );
 
 vacationerSchema.set("toJSON", {
