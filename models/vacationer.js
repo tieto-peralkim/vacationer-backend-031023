@@ -24,7 +24,6 @@ const vacationerSchema = new mongoose.Schema(
             type: Array,
             default: [
                 {
-                    _id: false,
                     holidayColor: "#73D8FF",
                     unConfirmedHolidayColor: "#68CCCA",
                     weekendColor: "#808080",
