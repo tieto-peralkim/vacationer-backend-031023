@@ -42,19 +42,22 @@ teamsRouter.get("/:id", (req, res, next) => {
 // Add a new member (vacationer) to team
 teamsRouter.post("/:id", (req, res, next) => {
     const teamId = req.params.id;
-    const newMember = { name: req.body.name, vacationerId: req.body.id };
+    const newMembers = req.body;
 
-    console.log("Adding newMember:", newMember, " ", " to teamId:", teamId);
+    console.log(newMembers);
 
-    Team.findByIdAndUpdate(
-        teamId,
-        { $push: { members: newMember } },
-        { new: true, runValidators: true, context: "query" }
-    )
-        .then((updatedTeam) => {
-            res.status(200).json(updatedTeam);
-        })
-        .catch((error) => next(error));
+    newMembers.forEach(member => {
+        Team.findByIdAndUpdate(
+            teamId,
+            { $push: { members: member } },
+            { new: true, runValidators: true, context: "query" }
+        )
+            .then((updatedTeam) => {
+                res.status(200).json(updatedTeam);
+            })
+            .catch((error) => next(error));
+    });
+
 });
 
 // Change team name
