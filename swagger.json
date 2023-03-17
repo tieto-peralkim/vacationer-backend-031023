@@ -3,7 +3,137 @@
     "info": {
         "version": "0.2.0",
         "title": "Vacationer API",
-        "description": "API for vacations of Vacationer",
-},
+        "description": "API for vacationers and teams, Slack messages and login"
+    },
+    "host": "localhost:3001",
+    "basePath": "/",
+    "tags": [
+        {
+            "name": "Vacationers",
+            "description": "API for Vacationers"
+        }
+    ],
+    "schemes": ["http"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "paths": {
+        "/vacationers": {
+            "get": {
+                "tags": ["Vacationers"],
+                "summary": "Get all not-deleted vacationers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Vacationer"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Vacationers"],
+                "summary": "Create new Vacationer",
+                "description": "Only name and nameId needed",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "nameId": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New vacationer is created",
+                        "schema": {
+                            "$ref": "#/definitions/Vacationer"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Vacationer": {
+            "required": ["name", "nameId", "admin"],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "nameId": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "admin": {
+                    "type": "string"
+                },
+                "calendarSettings": {
+                    "type": "array",
+                    "properties":
+                        {
+                            "holidayColor": {
+                                "default": "#73D8FF",
+                                "example": "#73D8FF",
+                                "type": "string"
+                            },
+                            "unConfirmedHolidayColor": {
+                                "default": "#68CCCA",
+                                "example": "#68CCCA",
+                                "type": "string"
+                            },
+                            "weekendColor": {
+                                "default": "#808080",
+                                "example": "#808080",
+                                "type": "string"
+                            },
+                            "weekendHolidayColor": {
+                                "default": "#CCCCCC",
+                                "example": "#CCCCCC",
+                                "type": "string"
+                            },
+                            "holidaySymbol": {
+                                "default": "X",
+                                "example": "X",
+                                "type": "string"
+                            },
+                            "unConfirmedHolidaySymbol": {
+                                "default": "Y",
+                                "example": "Y",
+                                "type": "string"
+                            }
+                        }
 
+                },
+                "vacations": {
+                    "type": "array",
+                    "properties": {
+                        "comment": {
+                            "type": "string"
+                        },
+                        "confirmed": {
+                            "type": "boolean"
+                        },
+                        "start": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "end": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
