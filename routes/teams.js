@@ -47,9 +47,10 @@ teamsRouter.post("/:id", (req, res, next) => {
     console.log(newMembers);
 
     newMembers.forEach(member => {
+        let newMember = {name: member.name, vacationerId: member.id}
         Team.findByIdAndUpdate(
             teamId,
-            { $push: { members: member } },
+            { $push: { members: newMember } },
             { new: true, runValidators: true, context: "query" }
         )
             .then((updatedTeam) => {
