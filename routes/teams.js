@@ -54,11 +54,12 @@ teamsRouter.post("/:id", (req, res, next) => {
             { new: true, runValidators: true, context: "query" }
         )
             .then((updatedTeam) => {
-                res.status(200).json(updatedTeam);
+                console.log(updatedTeam);
             })
             .catch((error) => next(error));
-    });
-
+        });
+        
+    res.status(200);
 });
 
 // Change team name
@@ -119,7 +120,7 @@ teamsRouter.put("/members/:id", (req, res, next) => {
     const teamId = req.params.id;
     const memberId = req.body.vacationerId;
     console.log("IDs", teamId, memberId);
-    Team.updateOne(
+    Team.findByIdAndUpdate(
         { _id: teamId },
         {
             $pull: {
