@@ -17,9 +17,11 @@
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^5.13.14",
+    "mongoose-to-swagger": "^1.4.0",
     "morgan": "~1.9.1",
     "node-cron": "^3.0.2",
     "pug": "2.0.0-beta11",
+    "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.2"
   },
   "devDependencies": {

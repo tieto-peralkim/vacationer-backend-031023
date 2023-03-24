@@ -1,7 +1,41 @@
 const vacationersRouter = require("express").Router();
 const Vacationer = require("../models/vacationer");
-
-// Get all the vacationers (NOT deleted Vacationers) and their vacations
+// TODO: For the swagger, add vacation body structures. Add these for body of POST /vacationers
+// -  in: path
+// name: name
+// description: Username in the application
+// schema:
+//     type: string
+// required: true
+// -  in: path
+// name: nameId
+// description: Github user name
+// schema:
+//     type: string
+// required: true
+//TODO: Should this be deleted?
+/**
+ * @openapi
+ * /vacationers:
+ *  get:
+ *      tags: ["vacationer"]
+ *      summary: Get all the vacationers (NOT deleted vacationers) and their vacations
+ *      description: Get all the vacationers (NOT deleted vacationers) and their vacations
+ *      responses:
+ *          200:
+ *              description: Returns all vacationers
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ *
+ */
 vacationersRouter.get("/", (req, res, next) => {
     Vacationer.find({ deletedAt: { $exists: false } })
         .then((vacationer) => {
@@ -10,7 +44,28 @@ vacationersRouter.get("/", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Get all the vacationers (also deleted Vacationers) and their vacations
+//TODO: Should this be deleted?
+/**
+ * @openapi
+ * /vacationers/allUsers:
+ *  get:
+ *      tags: ["vacationer"]
+ *      summary: Get all the vacationers (also deleted) and their vacations
+ *      description: Get all the vacationers (also deleted) and their vacations
+ *      responses:
+ *          200:
+ *              description: Returns all vacationers (also deleted)
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.get("/allUsers", (req, res, next) => {
     Vacationer.find()
         .then((vacationer) => {
@@ -19,7 +74,27 @@ vacationersRouter.get("/allUsers", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Get all the deleted Vacationers and their vacations
+/**
+ * @openapi
+ * /vacationers/deleted:
+ *  get:
+ *      tags: ["vacationer"]
+ *      summary: Get only the deleted vacationers and their vacations
+ *      description: Get only the deleted vacationers and their vacations
+ *      responses:
+ *          200:
+ *              description: Returns deleted vacationers
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.get("/deleted", (req, res, next) => {
     Vacationer.find({ deletedAt: { $ne: null } })
         .then((vacationer) => {
@@ -28,7 +103,34 @@ vacationersRouter.get("/deleted", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Get name and id of all the vacationers (NOT deleted Vacationers)
+/**
+ * @openapi
+ * /vacationers/total:
+ *  get:
+ *      tags: ["vacationer"]
+ *      summary: Get all the vacationers in short form (NOT deleted vacationers)
+ *      description: Get all the vacationers in short form (NOT deleted vacationers)
+ *      responses:
+ *          200:
+ *              description: Returns name and id of vacationers
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              type: object
+ *                              properties:
+ *                                  name:
+ *                                      type: string
+ *                                      description: User name of vacationer
+ *                                  id:
+ *                                      type: string
+ *                                      description: Id of vacationer
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.get("/total", (req, res, next) => {
     Vacationer.find({ deletedAt: { $exists: false } }, { name: 1 })
         .then((vacationer) => {
@@ -36,8 +138,36 @@ vacationersRouter.get("/total", (req, res, next) => {
         })
         .catch((error) => next(error));
 });
-
-// Get single vacationer with name id
+/**
+ * @openapi
+ * /vacationers/getById/{nameId}:
+ *  get:
+ *      tags: ["vacationer"]
+ *      summary: Get single vacationer by name id. If not found, create a new user
+ *      description: Get single vacationer by name id. If not found, create a new user
+ *      parameters:
+ *      -   in: path
+ *          name: nameId
+ *          description: NameId of the user
+ *          schema:
+ *              type: string
+ *          required: true
+ *      responses:
+ *          200:
+ *              description: Returns single vacationer
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *          201:
+ *              description: User not found, created a new user successfully
+ *          401:
+ *              description: Unauthenticated user
+ *          409:
+ *              description: User not found, when trying to create a new user, user name already taken
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.get("/getById/:nameId", (req, res, next) => {
     let newName = req.params.nameId;
     console.log("newName", newName);
@@ -76,7 +206,32 @@ vacationersRouter.get("/getById/:nameId", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Get single vacationer with vacations
+/**
+ * @openapi
+ * /vacationers/{vacationerId}:
+ *  get:
+ *      tags: ["vacationer"]
+ *      summary: Get single vacationer by MongoDB ID
+ *      description: Get single vacationer by MongoDB ID
+ *      parameters:
+ *      -   in: path
+ *          name: vacationerId
+ *          description: MongoDB ID of the vacationer
+ *          schema:
+ *              type: string
+ *          required: true
+ *      responses:
+ *          200:
+ *              description: Returns single vacationer
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.get("/:vacationerId", (req, res, next) => {
     Vacationer.findById(req.params.vacationerId)
         .then((foundVacationer) => {
@@ -85,7 +240,36 @@ vacationersRouter.get("/:vacationerId", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Add a vacationer
+/**
+ * @openapi
+ * /vacationers:
+ *  post:
+ *      tags: ["vacationer"]
+ *      summary: Add a vacationer
+ *      description: Add a vacationer
+ *      parameters:
+ *      -  in: body
+ *         name: body
+ *         description: New vacationer to be added
+ *         schema:
+ *             $ref: "#/components/schemas/vacationer"
+ *         required: true
+ *      responses:
+ *          201:
+ *              description: Returns added vacationer
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          409:
+ *              description: When trying to create a new user, user name already taken
+ *          422:
+ *              description: Validation error (middleware)
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.post("/", (req, res, next) => {
     const body = req.body;
     const VacationerObject = new Vacationer(body);
@@ -104,7 +288,41 @@ vacationersRouter.post("/", (req, res, next) => {
         });
 });
 
-// Change vacationer name
+/**
+ * @openapi
+ * /vacationers/{vacationerId}:
+ *  patch:
+ *      tags: ["vacationer"]
+ *      summary: Change name of a single vacationer
+ *      description: Change name of a single vacationer
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          newName:
+ *                              description: New name for vacationer
+ *                              type: string
+ *      parameters:
+ *      -   in: path
+ *          name: vacationerId
+ *          description: MongoDB ID of the vacationer
+ *          type: string
+ *          required: true
+ *      responses:
+ *          200:
+ *              description: Returns updated vacationer
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.patch("/:vacationerId", (req, res, next) => {
     const userId = req.params.vacationerId;
     const newName = req.body.newName;
@@ -122,7 +340,68 @@ vacationersRouter.patch("/:vacationerId", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Change vacationer calendarSettings
+/**
+ * @openapi
+ * /vacationers/{vacationerId}/calendarSettings:
+ *  patch:
+ *      tags: ["vacationer"]
+ *      summary: Change calendar settings of single vacationer
+ *      description: Change calendar settings of single vacationer
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          newCalendarSettings:
+ *                              description: New calendar settings for vacationer
+ *                              type: array
+ *                              items:
+ *                                  type: object
+ *                                  properties:
+ *                                      holidayColor:
+ *                                          type: string
+ *                                          default: "#73D8FF"
+ *                                          description: Holiday color
+ *                                      unConfirmedHolidayColor:
+ *                                          type: string
+ *                                          default: "#68CCCA"
+ *                                          description: Unconfirmed holiday color
+ *                                      weekendColor:
+ *                                          type: string
+ *                                          default: "#808080"
+ *                                          description: Weekend color
+ *                                      weekendHolidayColor:
+ *                                          type: string
+ *                                          default: "#CCCCCC"
+ *                                          description: Weekend holiday color
+ *                                      holidaySymbol:
+ *                                          type: string
+ *                                          default: "X"
+ *                                          description: Holiday symbol
+ *                                      unConfirmedHolidaySymbol:
+ *                                          type: string
+ *                                          default: "Y"
+ *                                          description: Unconfirmed holiday symbol
+ *      parameters:
+ *      -   in: path
+ *          name: vacationerId
+ *          description: MongoDB ID of the vacationer
+ *          type: string
+ *          required: true
+ *      responses:
+ *          200:
+ *              description: Returns updated vacationer
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.patch("/:vacationerId/calendarSettings", (req, res, next) => {
     const userId = req.params.vacationerId;
     const newCalendarSettings = req.body.newCalendarSettings;
@@ -138,7 +417,25 @@ vacationersRouter.patch("/:vacationerId/calendarSettings", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Add or remove admin role of vacationer
+/**
+ * @openapi
+ * /vacationers/{vacationerId}/admin:
+ *  patch:
+ *      tags: ["vacationer"]
+ *      summary: Add or remove admin role of single vacationer
+ *      description: Add or remove admin role of single vacationer
+ *      responses:
+ *          200:
+ *              description: Returns updated vacationer
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.patch("/:vacationerId/admin", (req, res, next) => {
     const userId = req.params.vacationerId;
     const adminRole = req.body.adminRole;
@@ -154,7 +451,26 @@ vacationersRouter.patch("/:vacationerId/admin", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Add vacationer calendarSettings
+/**
+ * @openapi
+ * /vacationers/{vacationerId}/calendarSettings:
+ *  post:
+ *      tags: ["vacationer"]
+ *      summary: Add new set of calendar settings of single vacationer
+ *      description: Add new set of calendar settings of single vacationer
+ *      responses:
+ *          200:
+ *              description: Returns updated vacationer
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ *      deprecated: true
+ */
 vacationersRouter.post("/:vacationerId/calendarSettings", (req, res, next) => {
     const userId = req.params.vacationerId;
     const newCalendarSettings = req.body;
@@ -165,7 +481,6 @@ vacationersRouter.post("/:vacationerId/calendarSettings", (req, res, next) => {
         " to vacationerId:",
         userId
     );
-
     Vacationer.findByIdAndUpdate(
         userId,
         { $push: { calendarSettings: newCalendarSettings } },
@@ -177,7 +492,25 @@ vacationersRouter.post("/:vacationerId/calendarSettings", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Safe delete vacationer (can be returned with /undelete)
+/**
+ * @openapi
+ * /vacationers/{vacationerId}/delete:
+ *  post:
+ *      tags: ["vacationer"]
+ *      summary: Safe delete vacationer (can be returned with /undelete)
+ *      description: Safe delete vacationer (can be returned with /undelete)
+ *      responses:
+ *          200:
+ *              description: Returns safe deleted vacationer
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.put("/:vacationerId/delete", (req, res, next) => {
     Vacationer.findByIdAndUpdate(
         req.params.vacationerId,
@@ -190,7 +523,25 @@ vacationersRouter.put("/:vacationerId/delete", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Return deleted vacationer
+/**
+ * @openapi
+ * /vacationers/{vacationerId}/undelete:
+ *  post:
+ *      tags: ["vacationer"]
+ *      summary: Return safe deleted vacationer
+ *      description: Return safe deleted vacationer
+ *      responses:
+ *          200:
+ *              description: Returns undeleted vacationer
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.put("/:vacationerId/undelete", (req, res, next) => {
     Vacationer.findByIdAndUpdate(
         req.params.vacationerId,
@@ -203,7 +554,25 @@ vacationersRouter.put("/:vacationerId/undelete", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Delete vacationer permanently (can not be returned)
+/**
+ * @openapi
+ * /vacationers/{vacationerId}:
+ *  delete:
+ *      tags: ["vacationer"]
+ *      summary: Delete vacationer permanently
+ *      description: Delete vacationer permanently
+ *      responses:
+ *          200:
+ *              description: Returns deleted vacationer
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.delete("/:vacationerId", (req, res, next) => {
     Vacationer.findByIdAndRemove(req.params.vacationerId)
         .then((deletedVacationer) => {
@@ -213,7 +582,45 @@ vacationersRouter.delete("/:vacationerId", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Add a vacation
+/**
+ * @openapi
+ * /vacationers/{vacationerId}:
+ *  post:
+ *      tags: ["vacationer"]
+ *      summary: Add a vacation for vacationer
+ *      description: Add a vacation for vacationer
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: "#/components/schemas/vacationer"
+ *      parameters:
+ *       -  in: path
+ *          name: vacationerId
+ *          description: MongoDB ID of vacationer of the new vacation
+ *          schema:
+ *              type: string
+ *          required: true
+ *       -  in: body
+ *          name: body
+ *          description: New vacation to be added
+ *          schema:
+ *              type: array
+ *          required: true
+ *      responses:
+ *          200:
+ *              description: Returns vacationer whose vacation was added
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.post("/:vacationerId", (req, res, next) => {
     const vacationerId = req.params.vacationerId;
     const newHoliday = req.body;
@@ -225,7 +632,6 @@ vacationersRouter.post("/:vacationerId", (req, res, next) => {
         " to vacationerId:",
         vacationerId
     );
-
     Vacationer.findByIdAndUpdate(
         vacationerId,
         { $push: { vacations: newHoliday } },
@@ -237,7 +643,51 @@ vacationersRouter.post("/:vacationerId", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Replace a vacation (also the _id value)
+/**
+ * @openapi
+ * /vacationers/{vacationerId}/{holidayId}:
+ *  put:
+ *      tags: ["vacationer"]
+ *      summary: Modify vacation (creates also a new vacation id)
+ *      description: Modify vacation (creates also a new vacation id)
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: "#/components/schemas/vacationer"
+ *      parameters:
+ *       -  in: path
+ *          name: vacationerId
+ *          description: MongoDB ID of vacationer of the modified vacation
+ *          schema:
+ *              type: string
+ *          required: true
+ *       -  in: path
+ *          name: holidayId
+ *          description: MongoDB ID of Vacation of the modified vacation
+ *          schema:
+ *              type: string
+ *          required: true
+ *       -  in: body
+ *          name: body
+ *          description: Modified vacation
+ *          schema:
+ *              type: array
+ *          required: true
+ *      responses:
+ *          200:
+ *              description: Returns vacationer whose vacation was modified
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.put("/:vacationerId/:holidayId", (req, res, next) => {
     console.log(
         "Modifying vacationerId",
@@ -262,7 +712,38 @@ vacationersRouter.put("/:vacationerId/:holidayId", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Delete a vacation
+/**
+ * @openapi
+ * /vacationers/{vacationerId}/{holidayId}:
+ *  delete:
+ *      tags: ["vacationer"]
+ *      summary: Delete vacation permanently
+ *      description: Delete vacation permanently
+ *      parameters:
+ *      -  in: path
+ *         name: vacationerId
+ *         description: MongoDB ID of vacationer of the modified vacation
+ *         schema:
+ *             type: string
+ *         required: true
+ *      -  in: path
+ *         name: holidayId
+ *         description: MongoDB ID of Vacation of the modified vacation
+ *         schema:
+ *             type: string
+ *         required: true
+ *      responses:
+ *          200:
+ *              description: Returns deleted vacation
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/vacationer"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 vacationersRouter.delete("/:vacationerId/:holidayId", (req, res, next) => {
     console.log(
         "Deleting vacationerId",

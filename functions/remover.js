@@ -7,20 +7,16 @@ async function removeDeletableData() {
     monthAgo.setMonth(monthAgo.getMonth() - 1);
     monthAgo.setUTCHours(0, 0, 0, 0);
 
-    // let minutesAgo = new Date();
-    // let amountOfMins = 2;
-    // minutesAgo.setMinutes(minutesAgo.getMinutes() - amountOfMins);
-
     let selectedLimit = monthAgo;
 
     console.log("Vacationers deleted before", selectedLimit);
     let deletableVacationers = await Vacationer.find(
-        { deletedVacationer: true, deletedAt: { $lt: selectedLimit } },
+        { deletedAt: { $lt: selectedLimit } },
         { id: 1 }
     );
     console.log("Teams deleted before", selectedLimit);
     let deletableTeams = await Team.find(
-        { deletedTeam: true, deletedAt: { $lt: selectedLimit } },
+        { deletedAt: { $lt: selectedLimit } },
         { id: 1 }
     );
 

@@ -3,46 +3,79 @@ mongoose.set("useFindAndModify", false);
 
 const vacationerSchema = new mongoose.Schema(
     {
-        // Name to show in UI
         name: {
             type: String,
             minlength: 3,
             required: true,
+            description: "Name of the user",
         },
-        // Github user name
         nameId: {
             type: String,
             required: true,
             unique: true,
+            description: "Github user name",
         },
         admin: {
             type: Boolean,
             default: false,
             required: true,
+            description: "Admin flag",
         },
         calendarSettings: {
             type: Array,
             default: [
                 {
-                    holidayColor: "#73D8FF",
-                    unConfirmedHolidayColor: "#68CCCA",
-                    weekendColor: "#808080",
-                    weekendHolidayColor: "#CCCCCC",
-                    holidaySymbol: "X",
-                    unConfirmedHolidaySymbol: "Y",
+                    holidayColor: {
+                        type: String,
+                        default: "#73D8FF",
+                    },
+                    unConfirmedHolidayColor: {
+                        type: String,
+                        default: "#68CCCA",
+                    },
+                    weekendColor: {
+                        type: String,
+                        default: "#808080",
+                    },
+                    weekendHolidayColor: {
+                        type: String,
+                        default: "#CCCCCC",
+                    },
+                    holidaySymbol: {
+                        type: String,
+                        default: "X",
+                    },
+                    unConfirmedHolidaySymbol: {
+                        type: String,
+                        default: "Y",
+                    },
                 },
             ],
+            description: "Calendar colors and symbols",
         },
         vacations: [
             {
-                comment: String,
-                confirmed: Boolean,
-                start: Date,
-                end: Date,
+                comment: {
+                    type: String,
+                    description: "Optional description of vacation",
+                },
+                confirmed: {
+                    type: Boolean,
+                    description: "Confirmed flag of vacation",
+                },
+                start: {
+                    type: Date,
+                    description: "Starting date of vacation",
+                },
+                end: {
+                    type: Date,
+                    description: "Ending date of vacation",
+                },
             },
         ],
         deletedAt: {
             type: Date,
+            description: "Date of deletion of vacation",
         },
     },
     // Adds createdAt and updatedAt fields

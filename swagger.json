@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.2.0",
+        "version": "0.3.0",
         "title": "Vacationer API",
         "description": "API for vacationers and teams, Slack messages and login"
     },
@@ -10,7 +10,7 @@
     "tags": [
         {
             "name": "Vacationers",
-            "description": "API for Vacationers"
+            "description": "User data"
         }
     ],
     "schemes": ["http"],
@@ -20,7 +20,7 @@
         "/vacationers": {
             "get": {
                 "tags": ["Vacationers"],
-                "summary": "Get all not-deleted vacationers",
+                "summary": "Get all not-deleted users",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -32,8 +32,8 @@
             },
             "post": {
                 "tags": ["Vacationers"],
-                "summary": "Create new Vacationer",
-                "description": "Only name and nameId needed",
+                "summary": "Create new user",
+                "description": "Provide name and nameId (Github user name). As a default, name = nameId",
                 "parameters": [
                     {
                         "name": "body",
@@ -65,8 +65,11 @@
     },
     "definitions": {
         "Vacationer": {
-            "required": ["name", "nameId", "admin"],
+            "required": ["id", "name", "nameId", "admin"],
             "properties": {
+                "id": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -75,63 +78,70 @@
                     "uniqueItems": true
                 },
                 "admin": {
-                    "type": "string"
+                    "type": "boolean",
+                    "default": false
                 },
                 "calendarSettings": {
                     "type": "array",
-                    "properties":
-                        {
+                    "items": {
+                        "type": "object",
+                        "properties": {
                             "holidayColor": {
                                 "default": "#73D8FF",
-                                "example": "#73D8FF",
                                 "type": "string"
                             },
                             "unConfirmedHolidayColor": {
                                 "default": "#68CCCA",
-                                "example": "#68CCCA",
                                 "type": "string"
                             },
                             "weekendColor": {
                                 "default": "#808080",
-                                "example": "#808080",
                                 "type": "string"
                             },
                             "weekendHolidayColor": {
                                 "default": "#CCCCCC",
-                                "example": "#CCCCCC",
                                 "type": "string"
                             },
                             "holidaySymbol": {
                                 "default": "X",
-                                "example": "X",
                                 "type": "string"
                             },
                             "unConfirmedHolidaySymbol": {
                                 "default": "Y",
-                                "example": "Y",
                                 "type": "string"
                             }
                         }
-
+                    }
                 },
                 "vacations": {
                     "type": "array",
-                    "properties": {
-                        "comment": {
-                            "type": "string"
-                        },
-                        "confirmed": {
-                            "type": "boolean"
-                        },
-                        "start": {
-                            "type": "string",
-                            "format": "date-time"
-                        },
-                        "end": {
-                            "type": "string",
-                            "format": "date-time"
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "comment": {
+                                "type": "string"
+                            },
+                            "confirmed": {
+                                "type": "boolean"
+                            },
+                            "start": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "end": {
+                                "type": "string",
+                                "format": "date-time"
+                            }
                         }
                     }
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "updatedAt": {
+                    "type": "string",
+                    "format": "date-time"
                 }
             }
         }
