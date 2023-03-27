@@ -50,6 +50,18 @@ const options = {
                 name: "team",
                 description: "Teams of vacationers",
             },
+            {
+                name: "timeframes",
+                description: "Time based searches for Vacations",
+            },
+            {
+                name: "login",
+                description: "Login",
+            },
+            {
+                name: "slack",
+                description: "Slack message sender",
+            },
         ],
     },
     apis: ["./routes/*.js"],

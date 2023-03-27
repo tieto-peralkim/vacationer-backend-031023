@@ -1,7 +1,6 @@
 const teamsRouter = require("express").Router();
 const Team = require("../models/team");
 
-// TODO: add body variables
 /**
  * @openapi
  * /teams:
@@ -22,7 +21,7 @@ const Team = require("../models/team");
  *              description: Internal server error
  */
 teamsRouter.get("/", (req, res, next) => {
-    Team.find({ deletedTeam: { $ne: true } })
+    Team.find({ deletedAt: { $exists: false } })
         .then((team) => {
             res.status(200).json(team);
         })
@@ -49,7 +48,7 @@ teamsRouter.get("/", (req, res, next) => {
  *              description: Internal server error
  */
 teamsRouter.get("/deleted", (req, res, next) => {
-    Team.find({ deletedTeam: { $in: [true] } })
+    Team.find({ deletedAt: { $ne: null } })
         .then((team) => {
             res.status(200).json(team);
         })
@@ -61,15 +60,15 @@ teamsRouter.get("/deleted", (req, res, next) => {
  * /teams:
  *  post:
  *      tags: ["team"]
- *      summary: Create new team
- *      description: Create new team
- *      parameters:
- *      -   in: body
- *          name: body
- *          description: New team to be added
- *          schema:
- *              $ref: "#/components/schemas/team"
+ *      summary: Create new team (REQUEST NEEDS FIX id field is extra, vacationerId needed)
+ *      description: Create new team (REQUEST NEEDS FIX id field is extra, vacationerId needed)
+ *      requestBody:
  *          required: true
+ *          content:
+ *              application/json:
+ *                  description: New team to be added
+ *                  schema:
+ *                      $ref: "#/components/schemas/team"
  *      responses:
  *          201:
  *              description: Return created team
@@ -79,6 +78,10 @@ teamsRouter.get("/deleted", (req, res, next) => {
  *                          $ref: "#/components/schemas/team"
  *          401:
  *              description: Unauthenticated user
+ *          409:
+ *              description: When trying to create a new team, team title already taken
+ *          422:
+ *              description: Validation error (middleware)
  *          500:
  *              description: Internal server error
  */
@@ -90,7 +93,12 @@ teamsRouter.post("/", (req, res, next) => {
         .then((savedTeam) => {
             res.status(201).json(savedTeam);
         })
-        .catch((error) => next(error));
+        .catch((error) => {
+            if (error.code === 11000) {
+                res.status(409).json("This team title is already taken!");
+                next(error);
+            }
+        });
 });
 
 /**
@@ -98,8 +106,15 @@ teamsRouter.post("/", (req, res, next) => {
  * /teams/{id}:
  *  get:
  *      tags: ["team"]
- *      summary: Get single team by MongoDB ID
- *      description: Get single team by MongoDB ID
+ *      summary: Get single team by MongoDB ID (also deleted)
+ *      description: Get single team by MongoDB ID (also deleted)
+ *      parameters:
+ *      -   in: path
+ *          name: id
+ *          description: MongoDB ID of the team
+ *          schema:
+ *              type: string
+ *          required: true
  *      responses:
  *          200:
  *              description: Returns single team
@@ -125,18 +140,28 @@ teamsRouter.get("/:id", (req, res, next) => {
  * /teams/{id}:
  *  post:
  *      tags: ["team"]
- *      summary: Add new members (vacationers) to team
- *      description: Add new members (vacationers) to team
- *      parameters:
- *      -   in: body
- *          name: body
- *          description: New members
- *          schema:
- *              type: object
+ *      summary: Add new members (vacationers) to team (FIX check the members first)
+ *      description: Add new members (vacationers) to team (FIX check the members first)
+ *      requestBody:
+ *          description: New members to be added
  *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: array
+ *                      items:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  description: Name of member
+ *                                  type: string
+ *                              vacationerId:
+ *                                  description: MongoDB ID of member
+ *                                  type: string
+ *      parameters:
  *      -   in: path
  *          name: id
- *          description: MongoDB ID of target team
+ *          description: MongoDB ID of team
  *          schema:
  *              type: string
  *          required: true
@@ -178,13 +203,17 @@ teamsRouter.post("/:id", (req, res, next) => {
  *      tags: ["team"]
  *      summary: Change team name
  *      description: Change team name
- *      parameters:
- *      -   in: body
- *          name: body
- *          description: New team name
- *          schema:
- *              type: object
+ *      requestBody:
  *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          newName:
+ *                              description: New team name
+ *                              type: string
+ *      parameters:
  *      -   in: path
  *          name: id
  *          description: MongoDB ID of modifiable team
@@ -223,17 +252,21 @@ teamsRouter.patch("/:id", (req, res, next) => {
 /**
  * @openapi
  * /teams/{id}:
- *  patch:
+ *  put:
  *      tags: ["team"]
- *      summary: Change name of member in all the teams
- *      description: Change name of member in all the teams
- *      parameters:
- *      -   in: body
- *          name: body
- *          description: New member name
- *          schema:
- *              type: object
+ *      summary: Change name of member in all the teams TODO test this
+ *      description: Change name of member in all the teams TODO test this
+ *      requestBody:
  *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          newName:
+ *                              description: New name of member
+ *                              type: string
+ *      parameters:
  *      -   in: path
  *          name: id
  *          description: MongoDB ID of modifiable member
@@ -271,7 +304,14 @@ teamsRouter.put("/membername/:id", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Delete a team member from all the teams
+/**
+ * @openapi
+ * /teams/members/all/:
+ *  put:
+ *      tags: ["team"]
+ *      summary: Delete a team member from all teams (TODO!)
+ *      description: Delete a team member from all teams
+ */
 teamsRouter.put("/members/all", (req, res, next) => {
     const memberId = req.body.id;
     console.log("Deleting ", req.body.name, ":", memberId);
@@ -286,7 +326,14 @@ teamsRouter.put("/members/all", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Delete a team member from specific team
+/**
+ * @openapi
+ * /teams/members/{id}/:
+ *  put:
+ *      tags: ["team"]
+ *      summary: Delete a team member from specific team (TODO!)
+ *      description: Delete a team member from specific team
+ */
 teamsRouter.put("/members/:id", (req, res, next) => {
     const teamId = req.params.id;
     const memberId = req.body.vacationerId;
@@ -305,12 +352,37 @@ teamsRouter.put("/members/:id", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Safe delete team (can be returned with /undelete)
+/**
+ * @openapi
+ * /teams/{id}/delete:
+ *  put:
+ *      tags: ["team"]
+ *      summary: Safe delete team
+ *      description: Safe delete team
+ *      parameters:
+ *      -   in: path
+ *          name: id
+ *          description: MongoDB ID of deletable team
+ *          schema:
+ *              type: string
+ *          required: true
+ *      responses:
+ *          200:
+ *              description: Returns deleted team
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/team"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 teamsRouter.put("/:id/delete", (req, res, next) => {
     console.log("deleting", req.params.id);
     Team.findByIdAndUpdate(
         req.params.id,
-        { $set: { deletedTeam: true }, deletedAt: new Date() },
+        { $set: { deletedAt: new Date() } },
         { new: true, runValidators: true, context: "query" }
     )
         .then((deletedTeam) => {
@@ -320,11 +392,36 @@ teamsRouter.put("/:id/delete", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Return deleted team
+/**
+ * @openapi
+ * /teams/{id}/undelete:
+ *  put:
+ *      tags: ["team"]
+ *      summary: Return deleted team
+ *      description: Return deleted team
+ *      parameters:
+ *      -   in: path
+ *          name: id
+ *          description: MongoDB ID of returnable team
+ *          schema:
+ *              type: string
+ *          required: true
+ *      responses:
+ *          200:
+ *              description: Returns undeleted team
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/team"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 teamsRouter.put("/:id/undelete", (req, res, next) => {
     Team.findByIdAndUpdate(
         req.params.id,
-        { $set: { deletedTeam: false } },
+        { $unset: { deletedAt: 1 } },
         { new: true, runValidators: true, context: "query" }
     )
         .then((returnedTeam) => {
@@ -333,7 +430,32 @@ teamsRouter.put("/:id/undelete", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-// Delete team permanently (can not be returned)
+/**
+ * @openapi
+ * /teams/{id}:
+ *  delete:
+ *      tags: ["team"]
+ *      summary: Delete team permanently
+ *      description: Delete team permanently
+ *      parameters:
+ *      -   in: path
+ *          name: id
+ *          description: MongoDB ID of deletable team
+ *          schema:
+ *              type: string
+ *          required: true
+ *      responses:
+ *          200:
+ *              description: Returns permanently deleted team
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/team"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 teamsRouter.delete("/:id", (req, res, next) => {
     Team.findByIdAndRemove(req.params.id)
         .then((deletedTeam) => {

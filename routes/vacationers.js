@@ -211,8 +211,8 @@ vacationersRouter.get("/getById/:nameId", (req, res, next) => {
  * /vacationers/{vacationerId}:
  *  get:
  *      tags: ["vacationer"]
- *      summary: Get single vacationer by MongoDB ID
- *      description: Get single vacationer by MongoDB ID
+ *      summary: Get single vacationer by MongoDB ID (also deleted)
+ *      description: Get single vacationer by MongoDB ID (also deleted)
  *      parameters:
  *      -   in: path
  *          name: vacationerId
@@ -245,15 +245,15 @@ vacationersRouter.get("/:vacationerId", (req, res, next) => {
  * /vacationers:
  *  post:
  *      tags: ["vacationer"]
- *      summary: Add a vacationer
- *      description: Add a vacationer
- *      parameters:
- *      -  in: body
- *         name: body
- *         description: New vacationer to be added
- *         schema:
- *             $ref: "#/components/schemas/vacationer"
- *         required: true
+ *      summary: Add a vacationer (REQUEST NEEDS FIX id field is extra)
+ *      description: Add a vacationer (REQUEST NEEDS FIX id field is extra)
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  description: New vacationer to be added
+ *                  schema:
+ *                      $ref: "#/components/schemas/vacationer"
  *      responses:
  *          201:
  *              description: Returns added vacationer
@@ -355,7 +355,7 @@ vacationersRouter.patch("/:vacationerId", (req, res, next) => {
  *                      type: object
  *                      properties:
  *                          newCalendarSettings:
- *                              description: New calendar settings for vacationer
+ *                              description: Updated calendar settings for vacationer
  *                              type: array
  *                              items:
  *                                  type: object
@@ -424,6 +424,22 @@ vacationersRouter.patch("/:vacationerId/calendarSettings", (req, res, next) => {
  *      tags: ["vacationer"]
  *      summary: Add or remove admin role of single vacationer
  *      description: Add or remove admin role of single vacationer
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          adminRole:
+ *                              description: Admin role status
+ *                              type: boolean
+ *      parameters:
+ *      -   in: path
+ *          name: vacationerId
+ *          description: MongoDB ID of the vacationer
+ *          type: string
+ *          required: true
  *      responses:
  *          200:
  *              description: Returns updated vacationer
@@ -456,8 +472,46 @@ vacationersRouter.patch("/:vacationerId/admin", (req, res, next) => {
  * /vacationers/{vacationerId}/calendarSettings:
  *  post:
  *      tags: ["vacationer"]
- *      summary: Add new set of calendar settings of single vacationer
- *      description: Add new set of calendar settings of single vacationer
+ *      summary: Add new set of calendar settings of single vacationer (not implemented yet)
+ *      description: Add new set of calendar settings of single vacationer (not implemented yet)
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      description: New calendar settings for vacationer
+ *                      type: object
+ *                      properties:
+ *                          holidayColor:
+ *                              type: string
+ *                              default: "#73D8FF"
+ *                              description: Holiday color
+ *                          unConfirmedHolidayColor:
+ *                              type: string
+ *                              default: "#68CCCA"
+ *                              description: Unconfirmed holiday color
+ *                          weekendColor:
+ *                               type: string
+ *                               default: "#808080"
+ *                               description: Weekend color
+ *                          weekendHolidayColor:
+ *                               type: string
+ *                               default: "#CCCCCC"
+ *                               description: Weekend holiday color
+ *                          holidaySymbol:
+ *                               type: string
+ *                               default: "X"
+ *                               description: Holiday symbol
+ *                          unConfirmedHolidaySymbol:
+ *                               type: string
+ *                               default: "Y"
+ *                               description: Unconfirmed holiday symbol
+ *      parameters:
+ *      -   in: path
+ *          name: vacationerId
+ *          description: MongoDB ID of the vacationer
+ *          type: string
+ *          required: true
  *      responses:
  *          200:
  *              description: Returns updated vacationer
@@ -495,10 +549,16 @@ vacationersRouter.post("/:vacationerId/calendarSettings", (req, res, next) => {
 /**
  * @openapi
  * /vacationers/{vacationerId}/delete:
- *  post:
+ *  put:
  *      tags: ["vacationer"]
  *      summary: Safe delete vacationer (can be returned with /undelete)
  *      description: Safe delete vacationer (can be returned with /undelete)
+ *      parameters:
+ *      -   in: path
+ *          name: vacationerId
+ *          description: MongoDB ID of the vacationer
+ *          type: string
+ *          required: true
  *      responses:
  *          200:
  *              description: Returns safe deleted vacationer
@@ -526,10 +586,16 @@ vacationersRouter.put("/:vacationerId/delete", (req, res, next) => {
 /**
  * @openapi
  * /vacationers/{vacationerId}/undelete:
- *  post:
+ *  put:
  *      tags: ["vacationer"]
- *      summary: Return safe deleted vacationer
- *      description: Return safe deleted vacationer
+ *      summary: Return deleted vacationer (safe delete)
+ *      description: Return deleted vacationer (safe delete)
+ *      parameters:
+ *      -   in: path
+ *          name: vacationerId
+ *          description: MongoDB ID of the vacationer
+ *          type: string
+ *          required: true
  *      responses:
  *          200:
  *              description: Returns undeleted vacationer
@@ -561,6 +627,12 @@ vacationersRouter.put("/:vacationerId/undelete", (req, res, next) => {
  *      tags: ["vacationer"]
  *      summary: Delete vacationer permanently
  *      description: Delete vacationer permanently
+ *      parameters:
+ *      -   in: path
+ *          name: vacationerId
+ *          description: MongoDB ID of the deletable vacationer
+ *          type: string
+ *          required: true
  *      responses:
  *          200:
  *              description: Returns deleted vacationer
@@ -587,9 +659,10 @@ vacationersRouter.delete("/:vacationerId", (req, res, next) => {
  * /vacationers/{vacationerId}:
  *  post:
  *      tags: ["vacationer"]
- *      summary: Add a vacation for vacationer
- *      description: Add a vacation for vacationer
+ *      summary: Add a vacation for vacationer NEEDS FIX, use to-be-added Vacation model
+ *      description: Add a vacation for vacationer NEEDS FIX, use to-be-added Vacation model
  *      requestBody:
+ *          description: New vacation to be added
  *          required: true
  *          content:
  *              application/json:
@@ -599,14 +672,7 @@ vacationersRouter.delete("/:vacationerId", (req, res, next) => {
  *       -  in: path
  *          name: vacationerId
  *          description: MongoDB ID of vacationer of the new vacation
- *          schema:
- *              type: string
- *          required: true
- *       -  in: body
- *          name: body
- *          description: New vacation to be added
- *          schema:
- *              type: array
+ *          type: string
  *          required: true
  *      responses:
  *          200:
@@ -648,14 +714,13 @@ vacationersRouter.post("/:vacationerId", (req, res, next) => {
  * /vacationers/{vacationerId}/{holidayId}:
  *  put:
  *      tags: ["vacationer"]
- *      summary: Modify vacation (creates also a new vacation id)
- *      description: Modify vacation (creates also a new vacation id)
+ *      summary: Modify vacation (creates also a new vacation id) NEEDS FIX, use to-be-added Vacation model
+ *      description: Modify vacation (creates also a new vacation id) NEEDS FIX, use to-be-added Vacation model
  *      requestBody:
  *          required: true
  *          content:
  *              application/json:
- *                  schema:
- *                      $ref: "#/components/schemas/vacationer"
+ *                  description: Modified holiday
  *      parameters:
  *       -  in: path
  *          name: vacationerId
@@ -668,12 +733,6 @@ vacationersRouter.post("/:vacationerId", (req, res, next) => {
  *          description: MongoDB ID of Vacation of the modified vacation
  *          schema:
  *              type: string
- *          required: true
- *       -  in: body
- *          name: body
- *          description: Modified vacation
- *          schema:
- *              type: array
  *          required: true
  *      responses:
  *          200:
@@ -728,13 +787,13 @@ vacationersRouter.put("/:vacationerId/:holidayId", (req, res, next) => {
  *         required: true
  *      -  in: path
  *         name: holidayId
- *         description: MongoDB ID of Vacation of the modified vacation
+ *         description: MongoDB ID of the modified vacation
  *         schema:
  *             type: string
  *         required: true
  *      responses:
  *          200:
- *              description: Returns deleted vacation
+ *              description: Returns permanently deleted vacation
  *              content:
  *                  application/json:
  *                      schema:
@@ -751,6 +810,7 @@ vacationersRouter.delete("/:vacationerId/:holidayId", (req, res, next) => {
         "holidayId",
         req.params.holidayId
     );
+    // TODO: MongoDB pull will not raise an Error. Create logic for error?
     const vacationerId = req.params.vacationerId;
     const holidayId = req.params.holidayId;
     Vacationer.updateOne(
