@@ -245,8 +245,8 @@ vacationersRouter.get("/:vacationerId", (req, res, next) => {
  * /vacationers:
  *  post:
  *      tags: ["vacationer"]
- *      summary: Add a vacationer (REQUEST NEEDS FIX id field is extra)
- *      description: Add a vacationer (REQUEST NEEDS FIX id field is extra)
+ *      summary: Add a vacationer (TODO id field is extra)
+ *      description: Add a vacationer
  *      requestBody:
  *          required: true
  *          content:
@@ -659,8 +659,8 @@ vacationersRouter.delete("/:vacationerId", (req, res, next) => {
  * /vacationers/{vacationerId}:
  *  post:
  *      tags: ["vacationer"]
- *      summary: Add a vacation for vacationer NEEDS FIX, use to-be-added Vacation model
- *      description: Add a vacation for vacationer NEEDS FIX, use to-be-added Vacation model
+ *      summary: Add a vacation for vacationer TODO use to-be-added Vacation model
+ *      description: Add a vacation for vacationer
  *      requestBody:
  *          description: New vacation to be added
  *          required: true
@@ -714,8 +714,8 @@ vacationersRouter.post("/:vacationerId", (req, res, next) => {
  * /vacationers/{vacationerId}/{holidayId}:
  *  put:
  *      tags: ["vacationer"]
- *      summary: Modify vacation (creates also a new vacation id) NEEDS FIX, use to-be-added Vacation model
- *      description: Modify vacation (creates also a new vacation id) NEEDS FIX, use to-be-added Vacation model
+ *      summary: Modify vacation (creates also a new vacation id) TODO use to-be-added Vacation model
+ *      description: Modify vacation (creates also a new vacation id)
  *      requestBody:
  *          required: true
  *          content:
