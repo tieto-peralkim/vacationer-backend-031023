@@ -24,3 +24,7 @@ Normal process:
 npm start
 ```
 - Consume the API with http://localhost:3001/<ENDPOINT>
+
+## Deployments
+* QA: When PR has been merged, deployment starts automatically.
+* PROD: Adding a tag starts the deployment. Add same tag to both backend and frontend repos. Latest tags: https://github.com/tieto-cem/vacationer-backend/tags
