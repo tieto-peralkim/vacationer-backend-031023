@@ -1,4 +1,8 @@
-# Vacationer app backend
+# Vacationer API
+
+## API Documentation
+Swagger (you need to be signed in to Vacationer):
+- endpoint <BACKEND_ADDRESS>/api-docs, e.g. http://localhost:3001/api-docs
 
 ## Development instructions
 * Integrate code formatter Prettier to your IDE, check https://prettier.io/docs/en/editors.html
