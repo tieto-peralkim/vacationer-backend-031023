@@ -8,27 +8,30 @@ const teamSchema = new mongoose.Schema(
             minlength: 3,
             required: true,
             unique: true,
-        },
-        // TODO: remove this variable
-        deletedTeam: {
-            type: Boolean,
+            description: "Name of the team",
         },
         deletedAt: {
             type: Date,
+            description: "Date of deletion of vacation",
         },
         members: [
             {
-                name: { type: String },
+                name: {
+                    type: String,
+                    description: "Name of team member",
+                },
                 vacationerId: {
                     type: mongoose.Schema.Types.ObjectId,
                     ref: "Vacationer",
                     sparse: true,
+                    description: "Vacationer id of team member",
                 },
                 _id: false,
             },
         ],
     },
-    { timestamps: true } // Adds createdAt and updatedAt fields
+    // Adds createdAt and updatedAt fields
+    { timestamps: true }
 );
 
 teamSchema.set("toJSON", {

@@ -1,4 +1,8 @@
-# Vacationer app backend
+# Vacationer API
+
+## API Documentation
+Swagger (you need to be signed in to Vacationer):
+- endpoint <BACKEND_ADDRESS>/api-docs, e.g. http://localhost:3001/api-docs
 
 ## Development instructions
 * Integrate code formatter Prettier to your IDE, check https://prettier.io/docs/en/editors.html
@@ -11,6 +15,11 @@
 
 ```
 REACT_APP_MONGODB_URI=mongodb://<port>/<db name> Your local mongoDB address, e.g. mongodb://localhost:27017/vacation-data 
+```
+* After log in, in your local database add admin rights to your user with mongo command
+```
+  use <db name>
+  db.vacationers.updateOne({nameId: <your Github user name>},{$set: {admin: true}})
 ```
 
 Normal process:

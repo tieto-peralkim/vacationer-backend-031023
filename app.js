@@ -1,22 +1,23 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-const cookieParser = require('cookie-parser')
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const app = express();
-app.use(cookieParser())
+
+app.use(cookieParser());
 
 const allowedIP = process.env.REACT_APP_FRONT_ADDRESS;
 
 const corsConfig = {
     origin: allowedIP,
-    credentials: true
-}
+    credentials: true,
+};
 
 app.use(cors(corsConfig));
 
-require("./routes/api")(app)
+require("./routes/api")(app);
 
 const middleWare = require("./utils/middleware");
 const sendSlackMessage = require("./functions/slack");
@@ -101,4 +102,3 @@ const connectToMongoDB = (path) => {
 };
 
 connectToMongoDB(mongoUri);
-
