@@ -309,8 +309,29 @@ teamsRouter.put("/membername/:id", (req, res, next) => {
  * /teams/members/all/:
  *  put:
  *      tags: ["team"]
- *      summary: Delete a team member from all teams (TODO!)
+ *      summary: Delete a team member from all teams
  *      description: Delete a team member from all teams
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          id:
+ *                              description: MongoDB ID of deletable member
+ *                              type: string
+ *      responses:
+ *          200:
+ *              description: Returns deleted message
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: string
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
  */
 teamsRouter.put("/members/all", (req, res, next) => {
     const memberId = req.body.id;
@@ -320,8 +341,8 @@ teamsRouter.put("/members/all", (req, res, next) => {
             members: { vacationerId: memberId },
         },
     })
-        .then((updatedTeam) => {
-            res.status(200).json(updatedTeam);
+        .then(() => {
+            res.status(200).json("Deleted ", memberId, "from all the teams");
         })
         .catch((error) => next(error));
 });
