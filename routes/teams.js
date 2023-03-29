@@ -44,8 +44,6 @@ teamsRouter.post("/:id", (req, res, next) => {
     const teamId = req.params.id;
     const newMembers = req.body;
 
-    console.log(newMembers);
-
     newMembers.forEach(member => {
         let newMember = {name: member.name, vacationerId: member.id}
         Team.findByIdAndUpdate(
@@ -54,12 +52,11 @@ teamsRouter.post("/:id", (req, res, next) => {
             { new: true, runValidators: true, context: "query" }
         )
             .then((updatedTeam) => {
+                res.status(200).json(updatedTeam);
                 console.log(updatedTeam);
             })
             .catch((error) => next(error));
         });
-        
-    res.status(200);
 });
 
 // Change team name
