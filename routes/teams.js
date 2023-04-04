@@ -155,7 +155,7 @@ teamsRouter.get("/:id", (req, res, next) => {
  *                              name:
  *                                  description: Name of member
  *                                  type: string
- *                              vacationerId:
+ *                              id:
  *                                  description: MongoDB ID of member
  *                                  type: string
  *      parameters:
@@ -167,11 +167,11 @@ teamsRouter.get("/:id", (req, res, next) => {
  *          required: true
  *      responses:
  *          200:
- *              description: Returns updated team
+ *              description: Returns "ok"
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: "#/components/schemas/team"
+ *                          type: string
  *          401:
  *              description: Unauthenticated user
  *          500:
@@ -183,18 +183,26 @@ teamsRouter.post("/:id", (req, res, next) => {
 
     console.log(newMembers);
 
-    newMembers.forEach((member) => {
-        let newMember = { name: member.name, vacationerId: member.id };
+    for (let i = 0; i < newMembers.length; i++) {
+        let newMember = {
+            name: newMembers[i].name,
+            vacationerId: newMembers[i].id,
+        };
         Team.findByIdAndUpdate(
             teamId,
-            { $push: { members: newMember } },
-            { new: true, runValidators: true, context: "query" }
+            { $addToSet: { members: newMember } },
+            { upsert: true, runValidators: true, context: "query" }
         )
-            .then((updatedTeam) => {
-                res.status(200).json(updatedTeam);
+            .then(() => {
+                console.log(newMember.name, "added to", teamId);
+                if (i === newMembers.length - 1) {
+                    res.status(200).json({ message: "ok" });
+                }
             })
-            .catch((error) => next(error));
-    });
+            .catch((error) => {
+                next(error);
+            });
+    }
 });
 
 /**
@@ -396,6 +404,7 @@ teamsRouter.put("/members/:id", (req, res, next) => {
         }
     )
         .then((response) => {
+            console.log("Deleting ", memberId, "from", teamId);
             res.status(200).json(response);
         })
         .catch((error) => next(error));

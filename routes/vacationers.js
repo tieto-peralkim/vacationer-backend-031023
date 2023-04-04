@@ -170,7 +170,6 @@ vacationersRouter.get("/total", (req, res, next) => {
  */
 vacationersRouter.get("/getById/:nameId", (req, res, next) => {
     let newName = req.params.nameId;
-    console.log("newName", newName);
 
     Vacationer.find({ nameId: newName })
         .then((foundVacationer) => {
