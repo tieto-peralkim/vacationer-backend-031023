@@ -14,6 +14,20 @@ const EXPIRATIONDAYS = 7;
 
 /**
  * @openapi
+ * /checkAuthorization:
+ *  get:
+ *      tags: ["login"]
+ *      summary: Redirection to check permissions of Github Authorization
+ *      description: Redirection to check permissions of Github Authorization
+ */
+loginRouter.get("/checkAuthorization", (req, res) => {
+    res.redirect(
+        `https://github.com/settings/connections/applications/${clientId}`
+    );
+});
+
+/**
+ * @openapi
  * /auth:
  *  get:
  *      tags: ["login"]
