@@ -14,6 +14,25 @@ const EXPIRATIONDAYS = 7;
 
 /**
  * @openapi
+ * /checkStatus:
+ *  get:
+ *      tags: ["login"]
+ *      summary: Check that API is up
+ *      description: Check that API is up
+ *      responses:
+ *          200:
+ *              description: Status ok
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: string
+ */
+loginRouter.get("/checkStatus", (req, res) => {
+    res.status(200).send("Status ok");
+});
+
+/**
+ * @openapi
  * /checkAuthorization:
  *  get:
  *      tags: ["login"]
@@ -28,13 +47,13 @@ loginRouter.get("/checkAuthorization", (req, res) => {
 
 /**
  * @openapi
- * /auth:
+ * /login:
  *  get:
  *      tags: ["login"]
  *      summary: Redirection to Github Authorization
  *      description: Redirection to Github Authorization
  */
-loginRouter.get("/auth", (req, res) => {
+loginRouter.get("/login", (req, res) => {
     res.redirect(
         `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${SELECTEDSCOPE}`
     );
