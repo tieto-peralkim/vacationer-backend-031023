@@ -18,9 +18,13 @@ const teamSchema = new mongoose.Schema(
             {
                 name: {
                     type: String,
+                    unique: true,
+                    required: true,
                     description: "Name of team member",
                 },
                 vacationerId: {
+                    required: true,
+                    unique: true,
                     type: mongoose.Schema.Types.ObjectId,
                     ref: "Vacationer",
                     sparse: true,
