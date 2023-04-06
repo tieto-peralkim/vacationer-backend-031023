@@ -81,26 +81,23 @@ loginRouter.get("/callback", (req, res, next) => {
         },
     })
         .then((response) => {
-            let access_token = response.data.access_token;
-            axios({
-                method: "get",
-                url: `https://api.github.com/user`,
+            const access_token = response.data.access_token;
+            const config = {
                 headers: {
                     Authorization: `Bearer ${access_token}`,
                 },
-            }).then((response) => {
-                let username = { username: response.data.login };
-                axios({
-                    method: "get",
-                    url: `https://api.github.com/user/orgs`,
-                    headers: {
-                        Authorization: `Bearer ${access_token}`,
-                    },
-                }).then((response) => {
+            };
+            Promise.all([
+                axios.get("https://api.github.com/user", config),
+                axios.get("https://api.github.com/user/orgs", config),
+            ])
+                .then((response) => {
+                    let username = { username: response[0].data.login };
+                    let organisations = response[1].data;
                     let rightOrganization = false;
 
-                    for (let i = 0; i < response.data.length; i++) {
-                        if (response.data[i].login === ORGANISATION_NAME) {
+                    for (let i = 0; i < organisations.length; i++) {
+                        if (organisations[i].login === ORGANISATION_NAME) {
                             rightOrganization = true;
                         }
                     }
@@ -142,8 +139,10 @@ loginRouter.get("/callback", (req, res, next) => {
                     } else {
                         return res.redirect(302, `${frontUrl}/loginFailed`);
                     }
+                })
+                .catch((error) => {
+                    next(error);
                 });
-            });
         })
         .catch((error) => next(error));
 });
