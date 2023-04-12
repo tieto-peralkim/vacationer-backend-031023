@@ -1,4 +1,5 @@
 const vacationersRouter = require("express").Router();
+const { checkAdmin } = require("../functions/checkAdmin");
 const Vacationer = require("../models/vacationer");
 // TODO: For the swagger, add vacation body structures. Add these for body of POST /vacationers
 // -  in: path
@@ -455,15 +456,19 @@ vacationersRouter.patch("/:vacationerId/admin", (req, res, next) => {
     const userId = req.params.vacationerId;
     const adminRole = req.body.adminRole;
 
-    Vacationer.findByIdAndUpdate(
-        userId,
-        { $set: { admin: adminRole } },
-        { new: true, runValidators: true, context: "query" }
-    )
-        .then((updatedUser) => {
-            res.status(200).json(updatedUser);
-        })
-        .catch((error) => next(error));
+    if (req.cookies.admin.isAdmin) {
+        Vacationer.findByIdAndUpdate(
+            userId,
+            { $set: { admin: adminRole } },
+            { new: true, runValidators: true, context: "query" }
+        )
+            .then((updatedUser) => {
+                res.status(200).json(updatedUser);
+            })
+            .catch((error) => next(error));
+    } else {
+        res.status(401).json("Unauthorized");
+    }
 });
 
 /**
@@ -571,15 +576,19 @@ vacationersRouter.post("/:vacationerId/calendarSettings", (req, res, next) => {
  *              description: Internal server error
  */
 vacationersRouter.put("/:vacationerId/delete", (req, res, next) => {
-    Vacationer.findByIdAndUpdate(
-        req.params.vacationerId,
-        { $set: { deletedAt: new Date() } },
-        { new: true, runValidators: true, context: "query" }
-    )
-        .then((deletedVacationer) => {
-            res.status(200).json(deletedVacationer);
-        })
-        .catch((error) => next(error));
+    if (req.cookies.admin.isAdmin) {
+        Vacationer.findByIdAndUpdate(
+            req.params.vacationerId,
+            { $set: { deletedAt: new Date() } },
+            { new: true, runValidators: true, context: "query" }
+        )
+            .then((deletedVacationer) => {
+                res.status(200).json(deletedVacationer);
+            })
+            .catch((error) => next(error));
+    } else {
+        res.status(401).json("Unauthorized");
+    }
 });
 
 /**
@@ -608,15 +617,19 @@ vacationersRouter.put("/:vacationerId/delete", (req, res, next) => {
  *              description: Internal server error
  */
 vacationersRouter.put("/:vacationerId/undelete", (req, res, next) => {
-    Vacationer.findByIdAndUpdate(
-        req.params.vacationerId,
-        { $unset: { deletedAt: 1 } },
-        { new: true, runValidators: true, context: "query" }
-    )
-        .then((returnedVacationer) => {
-            res.status(200).json(returnedVacationer);
-        })
-        .catch((error) => next(error));
+    if (req.cookies.admin.isAdmin) {
+        Vacationer.findByIdAndUpdate(
+            req.params.vacationerId,
+            { $unset: { deletedAt: 1 } },
+            { new: true, runValidators: true, context: "query" }
+        )
+            .then((returnedVacationer) => {
+                res.status(200).json(returnedVacationer);
+            })
+            .catch((error) => next(error));
+    } else {
+        res.status(401).json("Unauthorized");
+    }
 });
 
 /**
@@ -645,12 +658,16 @@ vacationersRouter.put("/:vacationerId/undelete", (req, res, next) => {
  *              description: Internal server error
  */
 vacationersRouter.delete("/:vacationerId", (req, res, next) => {
-    Vacationer.findByIdAndRemove(req.params.vacationerId)
-        .then((deletedVacationer) => {
-            console.log("Deleted user", req.params.vacationerId);
-            res.status(200).json(deletedVacationer);
-        })
-        .catch((error) => next(error));
+    if (req.cookies.admin.isAdmin) {
+        Vacationer.findByIdAndRemove(req.params.vacationerId)
+            .then((deletedVacationer) => {
+                console.log("Deleted user", req.params.vacationerId);
+                res.status(200).json(deletedVacationer);
+            })
+            .catch((error) => next(error));
+    } else {
+        res.status(401).json("Unauthorized");
+    }
 });
 
 /**

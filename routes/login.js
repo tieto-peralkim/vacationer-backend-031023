@@ -2,6 +2,7 @@ const axios = require("axios");
 const loginRouter = require("express").Router();
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const { checkAdmin } = require("../functions/checkAdmin");
 
 const clientId = process.env.REACT_APP_GHUB_ID;
 const clientSecret = process.env.REACT_APP_GHUB_SECRET;
@@ -95,50 +96,82 @@ loginRouter.get("/callback", (req, res, next) => {
                     let username = { username: response[0].data.login };
                     let organisations = response[1].data;
                     let rightOrganization = false;
-
-                    for (let i = 0; i < organisations.length; i++) {
-                        if (organisations[i].login === ORGANISATION_NAME) {
-                            rightOrganization = true;
-                        }
-                    }
-                    if (rightOrganization) {
-                        jwt.sign(
-                            username,
-                            secret,
-                            { expiresIn: `${EXPIRATIONDAYS}d` },
-                            (err, token) => {
-                                let [header, payload, signature] =
-                                    token.split(".");
-                                res.cookie(
-                                    "payload",
-                                    { payload },
-                                    {
-                                        expires: new Date(
-                                            Date.now() +
-                                                EXPIRATIONDAYS * 86400 * 1000
-                                        ),
-                                        httpOnly: false,
-                                        sameSite: "strict",
-                                    }
-                                );
-                                res.cookie(
-                                    "header-signature",
-                                    { header, signature },
-                                    {
-                                        expires: new Date(
-                                            Date.now() +
-                                                EXPIRATIONDAYS * 86400 * 1000
-                                        ),
-                                        httpOnly: true,
-                                        sameSite: "strict",
-                                    }
-                                );
-                                return res.redirect(302, `${frontUrl}/`);
+                    let isAdmin;
+                    checkAdmin(username)
+                        .then((res) => {
+                            isAdmin = res;
+                        })
+                        .then(() => {
+                            for (let i = 0; i < organisations.length; i++) {
+                                if (
+                                    organisations[i].login === ORGANISATION_NAME
+                                ) {
+                                    rightOrganization = true;
+                                }
                             }
-                        );
-                    } else {
-                        return res.redirect(302, `${frontUrl}/loginFailed`);
-                    }
+                            if (rightOrganization) {
+                                jwt.sign(
+                                    username,
+                                    secret,
+                                    { expiresIn: `${EXPIRATIONDAYS}d` },
+                                    (err, token) => {
+                                        let [header, payload, signature] =
+                                            token.split(".");
+                                        res.cookie(
+                                            "payload",
+                                            { payload },
+                                            {
+                                                expires: new Date(
+                                                    Date.now() +
+                                                        EXPIRATIONDAYS *
+                                                            86400 *
+                                                            1000
+                                                ),
+                                                httpOnly: false,
+                                                sameSite: "strict",
+                                            }
+                                        );
+                                        res.cookie(
+                                            "header-signature",
+                                            { header, signature },
+                                            {
+                                                expires: new Date(
+                                                    Date.now() +
+                                                        EXPIRATIONDAYS *
+                                                            86400 *
+                                                            1000
+                                                ),
+                                                httpOnly: true,
+                                                sameSite: "strict",
+                                            }
+                                        );
+                                        res.cookie(
+                                            "admin",
+                                            { isAdmin },
+                                            {
+                                                expires: new Date(
+                                                    Date.now() +
+                                                        EXPIRATIONDAYS *
+                                                            86400 *
+                                                            1000
+                                                ),
+                                                httpOnly: true,
+                                                sameSite: "strict",
+                                            }
+                                        );
+                                        return res.redirect(
+                                            302,
+                                            `${frontUrl}/`
+                                        );
+                                    }
+                                );
+                            } else {
+                                return res.redirect(
+                                    302,
+                                    `${frontUrl}/loginFailed`
+                                );
+                            }
+                        });
                 })
                 .catch((error) => {
                     next(error);
@@ -161,6 +194,7 @@ loginRouter.get("/callback", (req, res, next) => {
 loginRouter.get("/logout", (req, res) => {
     res.clearCookie("payload");
     res.clearCookie("header-signature");
+    res.clearCookie("admin");
     return res.redirect(302, `${frontUrl}/`);
 });
 
