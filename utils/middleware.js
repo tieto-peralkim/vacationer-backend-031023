@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const Vacationer = require("../models/vacationer");
 
 const unknownEndpoint = (req, res) => {
     res.status(404).send({ error: "unknown endpoint" });
@@ -52,8 +53,19 @@ const checkAuthentication = (req, res, next) => {
     }
 };
 
+function isAdmin() {
+    return async function(req, res, next) {
+        if (!req.cookies.admin.isAdmin) {
+            return res.status(403).send("Access denied.");
+        }
+        
+        next();
+    };
+};
+
 module.exports = {
     unknownEndpoint,
     errorHandler,
     checkAuthentication,
+    isAdmin
 };
