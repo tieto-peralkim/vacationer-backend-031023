@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const Vacationer = require("../models/vacationer");
 
 const unknownEndpoint = (req, res) => {
     res.status(404).send({ error: "unknown endpoint" });
@@ -58,7 +57,7 @@ function isAdmin() {
         if (!req.cookies.admin.isAdmin) {
             return res.status(403).send("Access denied.");
         }
-        
+
         next();
     };
 };

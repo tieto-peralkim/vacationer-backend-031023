@@ -1,5 +1,4 @@
 const vacationersRouter = require("express").Router();
-const { checkAdmin } = require("../functions/checkAdmin");
 const Vacationer = require("../models/vacationer");
 const { isAdmin } = require("../utils/middleware");
 // TODO: For the swagger, add vacation body structures. Add these for body of POST /vacationers
