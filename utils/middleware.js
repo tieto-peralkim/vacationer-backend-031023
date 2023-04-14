@@ -19,34 +19,38 @@ const errorHandler = (error, req, res, next) => {
 };
 
 const checkAuthentication = (req, res, next) => {
-    const authCookie =
-        req.cookies["header-signature"].header +
-        "." +
-        req.cookies["payload"].payload +
-        "." +
-        req.cookies["header-signature"].signature;
-    let decodedUser;
-
-    try {
-        jwt.verify(
-            authCookie,
-            process.env.REACT_APP_JWT_SECRET,
-            (err, user) => {
-                if (err) {
-                    console.log(err);
-                    res.statusMessage = "Token error";
-                    res.status(401).end();
-                } else {
-                    decodedUser = user.username;
-                    next();
-                }
-            }
-        );
-    } catch (e) {
-        res.statusMessage = "Verification error";
+    if (!req.cookies["payload"] || !req.cookies["header-signature"]) {
+        res.statusMessage = "Not allowed!";
         res.status(401).end();
+    } else {
+        const authCookie =
+            req.cookies["header-signature"].header +
+            "." +
+            req.cookies["payload"].payload +
+            "." +
+            req.cookies["header-signature"].signature;
+        let decodedUser;
+
+        try {
+            jwt.verify(
+                authCookie,
+                process.env.REACT_APP_JWT_SECRET,
+                (err, user) => {
+                    if (err) {
+                        console.log(err);
+                        res.statusMessage = "Token error";
+                        res.status(401).end();
+                    } else {
+                        decodedUser = user.username;
+                        next();
+                    }
+                }
+            );
+        } catch (e) {
+            res.statusMessage = "Verification error";
+            res.status(401).end();
+        }
     }
-    
 };
 
 function isAdmin() {
