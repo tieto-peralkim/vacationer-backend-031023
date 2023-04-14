@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { decryptCookie } = require("../functions/dataSec");
+const Vacationer = require("../models/vacationer");
 
 const unknownEndpoint = (req, res) => {
     res.status(404).send({ error: "unknown endpoint" });
@@ -19,57 +20,70 @@ const errorHandler = (error, req, res, next) => {
 };
 
 const checkAuthentication = (req, res, next) => {
-    if (!req.cookies["payload"] || !req.cookies["header-signature"]) {
-        res.statusMessage = "Not allowed!";
+    const authCookie =
+        req.cookies["header-signature"].header +
+        "." +
+        req.cookies["payload"].payload +
+        "." +
+        req.cookies["header-signature"].signature;
+    let decodedUser;
+
+    try {
+        jwt.verify(
+            authCookie,
+            process.env.REACT_APP_JWT_SECRET,
+            (err, user) => {
+                if (err) {
+                    console.log(err);
+                    res.statusMessage = "Token error";
+                    res.status(401).end();
+                } else {
+                    decodedUser = user.username;
+                    next();
+                }
+            }
+        );
+    } catch (e) {
+        res.statusMessage = "Verification error";
         res.status(401).end();
-    } else {
+    }
+    
+};
+
+function isAdmin() {
+    return async function(req, res, next) {
         const authCookie =
-            req.cookies["header-signature"].header +
-            "." +
-            req.cookies["payload"].payload +
-            "." +
-            req.cookies["header-signature"].signature;
+        req.cookies["header-signature"].header +
+        "." +
+        req.cookies["payload"].payload +
+        "." +
+        req.cookies["header-signature"].signature;
         let decodedUser;
 
-        try {
             jwt.verify(
                 authCookie,
                 process.env.REACT_APP_JWT_SECRET,
                 (err, user) => {
                     if (err) {
                         console.log(err);
-                        res.statusMessage = "Token error";
-                        res.status(401).end();
                     } else {
                         decodedUser = user.username;
-                        next();
+
+                        Vacationer.find({ nameId: decodedUser })
+                        .then((foundVacationer) => {
+                            console.log(foundVacationer);
+                            if (foundVacationer[0].admin === false){
+                                return res.status(403).send("Access denied.");
+                            } else {
+                                next();
+                            }
+                        })
                     }
                 }
             );
-        } catch (e) {
-            res.statusMessage = "Verification error";
-            res.status(401).end();
-        }
-    }
-};
 
-function isAdmin() {
-    return async function(req, res, next) {
-        let cookie = req.cookies.admin.isAdmin
-        console.log(cookie);
-        cookie = decryptCookie(cookie);
 
-        if (cookie === "true") {
-            cookie = true;
-        } else {
-            cookie = false;
-        }
 
-        if (!cookie) {
-            return res.status(403).send("Access denied.");
-        }
-
-        next();
     };
 };
 

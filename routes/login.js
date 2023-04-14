@@ -97,83 +97,50 @@ loginRouter.get("/callback", (req, res, next) => {
                     let username = { username: response[0].data.login };
                     let organisations = response[1].data;
                     let rightOrganization = false;
-                    let isAdmin;
-                    checkAdmin(username)
-                        .then((res) => {
-                            isAdmin = res;
-                            isAdmin = encryptCookie(isAdmin);
-                        })
-                        .then(() => {
-                            for (let i = 0; i < organisations.length; i++) {
-                                if (
-                                    organisations[i].login === ORGANISATION_NAME
-                                ) {
-                                    rightOrganization = true;
-                                }
-                            }
-                            if (rightOrganization) {
-                                jwt.sign(
-                                    username,
-                                    secret,
-                                    { expiresIn: `${EXPIRATIONDAYS}d` },
-                                    (err, token) => {
-                                        let [header, payload, signature] =
-                                            token.split(".");
-                                        res.cookie(
-                                            "payload",
-                                            { payload },
-                                            {
-                                                expires: new Date(
-                                                    Date.now() +
-                                                        EXPIRATIONDAYS *
-                                                            86400 *
-                                                            1000
-                                                ),
-                                                httpOnly: false,
-                                                sameSite: "strict",
-                                            }
-                                        );
-                                        res.cookie(
-                                            "header-signature",
-                                            { header, signature },
-                                            {
-                                                expires: new Date(
-                                                    Date.now() +
-                                                        EXPIRATIONDAYS *
-                                                            86400 *
-                                                            1000
-                                                ),
-                                                httpOnly: true,
-                                                sameSite: "strict",
-                                            }
-                                        );
-                                        res.cookie(
-                                            "admin",
-                                            { isAdmin },
-                                            {
-                                                expires: new Date(
-                                                    Date.now() +
-                                                        EXPIRATIONDAYS *
-                                                            86400 *
-                                                            1000
-                                                ),
-                                                httpOnly: true,
-                                                sameSite: "strict",
-                                            }
-                                        );
-                                        return res.redirect(
-                                            302,
-                                            `${frontUrl}/`
-                                        );
+
+                    for (let i = 0; i < organisations.length; i++) {
+                        if (organisations[i].login === ORGANISATION_NAME) {
+                            rightOrganization = true;
+                        }
+                    }
+                    if (rightOrganization) {
+                        jwt.sign(
+                            username,
+                            secret,
+                            { expiresIn: `${EXPIRATIONDAYS}d` },
+                            (err, token) => {
+                                let [header, payload, signature] =
+                                    token.split(".");
+                                res.cookie(
+                                    "payload",
+                                    { payload },
+                                    {
+                                        expires: new Date(
+                                            Date.now() +
+                                                EXPIRATIONDAYS * 86400 * 1000
+                                        ),
+                                        httpOnly: false,
+                                        sameSite: "strict",
                                     }
                                 );
-                            } else {
-                                return res.redirect(
-                                    302,
-                                    `${frontUrl}/loginFailed`
+                                res.cookie(
+                                    "header-signature",
+                                    { header, signature },
+                                    {
+                                        expires: new Date(
+                                            Date.now() +
+                                                EXPIRATIONDAYS * 86400 * 1000
+                                        ),
+                                        httpOnly: true,
+                                        sameSite: "strict",
+                                    }
                                 );
+                                return res.redirect(302, `${frontUrl}/`);
                             }
-                        });
+                        );
+                    } else {
+                        return res.redirect(302, `${frontUrl}/loginFailed`);
+                    }
                 })
                 .catch((error) => {
                     next(error);
