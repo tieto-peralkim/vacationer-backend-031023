@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const { decryptCookie } = require("../functions/dataSec");
 const Vacationer = require("../models/vacationer");
 
 const unknownEndpoint = (req, res) => {

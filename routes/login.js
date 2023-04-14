@@ -2,8 +2,6 @@ const axios = require("axios");
 const loginRouter = require("express").Router();
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const { checkAdmin } = require("../functions/checkAdmin");
-const { encryptCookie, decryptCookie } = require("../functions/dataSec");
 
 const clientId = process.env.REACT_APP_GHUB_ID;
 const clientSecret = process.env.REACT_APP_GHUB_SECRET;
