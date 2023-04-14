@@ -161,7 +161,6 @@ loginRouter.get("/callback", (req, res, next) => {
 loginRouter.get("/logout", (req, res) => {
     res.clearCookie("payload");
     res.clearCookie("header-signature");
-    res.clearCookie("admin");
     return res.redirect(302, `${frontUrl}/`);
 });
 

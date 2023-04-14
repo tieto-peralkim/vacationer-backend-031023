@@ -55,13 +55,17 @@ const checkAuthentication = (req, res, next) => {
 
 function isAdmin() {
     return async function(req, res, next) {
-        const authCookie =
-        req.cookies["header-signature"].header +
-        "." +
-        req.cookies["payload"].payload +
-        "." +
-        req.cookies["header-signature"].signature;
-        let decodedUser;
+        if (!req.cookies["payload"] || !req.cookies["header-signature"]) {
+            res.statusMessage = "Not allowed!";
+            res.status(401).end();
+        } else {
+            const authCookie =
+            req.cookies["header-signature"].header +
+            "." +
+            req.cookies["payload"].payload +
+            "." +
+            req.cookies["header-signature"].signature;
+            let decodedUser;
 
             jwt.verify(
                 authCookie,
@@ -75,7 +79,7 @@ function isAdmin() {
                         Vacationer.find({ nameId: decodedUser })
                         .then((foundVacationer) => {
                             console.log(foundVacationer);
-                            if (foundVacationer[0].admin === false){
+                            if (foundVacationer[0].admin !== true){
                                 return res.status(403).send("Access denied.");
                             } else {
                                 next();
@@ -86,7 +90,7 @@ function isAdmin() {
             );
 
 
-
+        }
     };
 };
 
