@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { decryptCookie } = require("../functions/dataSec");
 
 const unknownEndpoint = (req, res) => {
     res.status(404).send({ error: "unknown endpoint" });
@@ -54,7 +55,17 @@ const checkAuthentication = (req, res, next) => {
 
 function isAdmin() {
     return async function(req, res, next) {
-        if (!req.cookies.admin.isAdmin) {
+        let cookie = req.cookies.admin.isAdmin
+        console.log(cookie);
+        cookie = decryptCookie(cookie);
+
+        if (cookie === "true") {
+            cookie = true;
+        } else {
+            cookie = false;
+        }
+
+        if (!cookie) {
             return res.status(403).send("Access denied.");
         }
 

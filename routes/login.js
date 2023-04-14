@@ -3,6 +3,7 @@ const loginRouter = require("express").Router();
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const { checkAdmin } = require("../functions/checkAdmin");
+const { encryptCookie, decryptCookie } = require("../functions/dataSec");
 
 const clientId = process.env.REACT_APP_GHUB_ID;
 const clientSecret = process.env.REACT_APP_GHUB_SECRET;
@@ -100,6 +101,7 @@ loginRouter.get("/callback", (req, res, next) => {
                     checkAdmin(username)
                         .then((res) => {
                             isAdmin = res;
+                            isAdmin = encryptCookie(isAdmin);
                         })
                         .then(() => {
                             for (let i = 0; i < organisations.length; i++) {
