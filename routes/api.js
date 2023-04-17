@@ -28,14 +28,14 @@ const options = {
                 url: "http://localhost:3001",
                 description: "Local",
             },
-            // {
-            //     url: "http://vacationer-sandbox.cem.ninja:3001",
-            //     description: "QA",
-            // },
-            // {
-            //     url: "https://vacationer.kube.cem.ninja/api",
-            //     description: "PROD",
-            // },
+            {
+                url: "http://vacationer-sandbox.cem.ninja:3001",
+                description: "QA",
+            },
+            {
+                url: "https://vacationer.kube.cem.ninja/api",
+                description: "PROD",
+            },
         ],
         components: {
             schemas: swaggerSchemas,
