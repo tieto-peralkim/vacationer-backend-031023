@@ -1,5 +1,6 @@
 const teamsRouter = require("express").Router();
 const Team = require("../models/team");
+const { isAdmin } = require("../utils/middleware");
 
 /**
  * @openapi
@@ -473,10 +474,12 @@ teamsRouter.put("/:id/delete", (req, res, next) => {
  *                          $ref: "#/components/schemas/team"
  *          401:
  *              description: Unauthenticated user
+ *          403:
+ *              description: Access denied. The user does not have admin rights
  *          500:
  *              description: Internal server error
  */
-teamsRouter.put("/:id/undelete", (req, res, next) => {
+teamsRouter.put("/:id/undelete", [isAdmin()], (req, res, next) => {
     Team.findByIdAndUpdate(
         req.params.id,
         { $unset: { deletedAt: 1 } },
@@ -511,10 +514,12 @@ teamsRouter.put("/:id/undelete", (req, res, next) => {
  *                          $ref: "#/components/schemas/team"
  *          401:
  *              description: Unauthenticated user
+ *          403:
+ *              description: Access denied. The user does not have admin rights 
  *          500:
  *              description: Internal server error
  */
-teamsRouter.delete("/:id", (req, res, next) => {
+teamsRouter.delete("/:id", [isAdmin()], (req, res, next) => {
     Team.findByIdAndRemove(req.params.id)
         .then((deletedTeam) => {
             res.status(200).json(deletedTeam);

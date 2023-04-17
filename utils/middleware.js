@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const Vacationer = require("../models/vacationer");
 
 const unknownEndpoint = (req, res) => {
     res.status(404).send({ error: "unknown endpoint" });
@@ -52,8 +53,50 @@ const checkAuthentication = (req, res, next) => {
     }
 };
 
+function isAdmin() {
+    return async function(req, res, next) {
+        if (!req.cookies["payload"] || !req.cookies["header-signature"]) {
+            res.statusMessage = "Not allowed!";
+            res.status(401).end();
+        } else {
+            const authCookie =
+            req.cookies["header-signature"].header +
+            "." +
+            req.cookies["payload"].payload +
+            "." +
+            req.cookies["header-signature"].signature;
+            let decodedUser;
+
+            jwt.verify(
+                authCookie,
+                process.env.REACT_APP_JWT_SECRET,
+                (err, user) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        decodedUser = user.username;
+
+                        Vacationer.find({ nameId: decodedUser })
+                        .then((foundVacationer) => {
+                            console.log(foundVacationer);
+                            if (foundVacationer[0].admin !== true){
+                                return res.status(403).send("Access denied.");
+                            } else {
+                                next();
+                            }
+                        })
+                    }
+                }
+            );
+
+
+        }
+    };
+};
+
 module.exports = {
     unknownEndpoint,
     errorHandler,
     checkAuthentication,
+    isAdmin
 };

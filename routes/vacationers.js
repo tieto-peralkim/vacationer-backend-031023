@@ -1,5 +1,6 @@
 const vacationersRouter = require("express").Router();
 const Vacationer = require("../models/vacationer");
+const { isAdmin } = require("../utils/middleware");
 // TODO: For the swagger, add vacation body structures. Add these for body of POST /vacationers
 // -  in: path
 // name: name
@@ -448,23 +449,29 @@ vacationersRouter.patch("/:vacationerId/calendarSettings", (req, res, next) => {
  *                          $ref: "#/components/schemas/vacationer"
  *          401:
  *              description: Unauthenticated user
+ *          403:
+ *              description: Access denied. The user does not have admin rights
  *          500:
  *              description: Internal server error
  */
-vacationersRouter.patch("/:vacationerId/admin", (req, res, next) => {
-    const userId = req.params.vacationerId;
-    const adminRole = req.body.adminRole;
+vacationersRouter.patch(
+    "/:vacationerId/admin",
+    [isAdmin()],
+    (req, res, next) => {
+        const userId = req.params.vacationerId;
+        const adminRole = req.body.adminRole;
 
-    Vacationer.findByIdAndUpdate(
-        userId,
-        { $set: { admin: adminRole } },
-        { new: true, runValidators: true, context: "query" }
-    )
-        .then((updatedUser) => {
-            res.status(200).json(updatedUser);
-        })
-        .catch((error) => next(error));
-});
+        Vacationer.findByIdAndUpdate(
+            userId,
+            { $set: { admin: adminRole } },
+            { new: true, runValidators: true, context: "query" }
+        )
+            .then((updatedUser) => {
+                res.status(200).json(updatedUser);
+            })
+            .catch((error) => next(error));
+    }
+);
 
 /**
  * @openapi
@@ -567,20 +574,26 @@ vacationersRouter.post("/:vacationerId/calendarSettings", (req, res, next) => {
  *                          $ref: "#/components/schemas/vacationer"
  *          401:
  *              description: Unauthenticated user
+ *          403:
+ *              description: Access denied. The user does not have admin rights
  *          500:
  *              description: Internal server error
  */
-vacationersRouter.put("/:vacationerId/delete", (req, res, next) => {
-    Vacationer.findByIdAndUpdate(
-        req.params.vacationerId,
-        { $set: { deletedAt: new Date() } },
-        { new: true, runValidators: true, context: "query" }
-    )
-        .then((deletedVacationer) => {
-            res.status(200).json(deletedVacationer);
-        })
-        .catch((error) => next(error));
-});
+vacationersRouter.put(
+    "/:vacationerId/delete",
+    [isAdmin()],
+    (req, res, next) => {
+        Vacationer.findByIdAndUpdate(
+            req.params.vacationerId,
+            { $set: { deletedAt: new Date() } },
+            { new: true, runValidators: true, context: "query" }
+        )
+            .then((deletedVacationer) => {
+                res.status(200).json(deletedVacationer);
+            })
+            .catch((error) => next(error));
+    }
+);
 
 /**
  * @openapi
@@ -604,20 +617,26 @@ vacationersRouter.put("/:vacationerId/delete", (req, res, next) => {
  *                          $ref: "#/components/schemas/vacationer"
  *          401:
  *              description: Unauthenticated user
+ *          403:
+ *              description: Access denied. The user does not have admin rights
  *          500:
  *              description: Internal server error
  */
-vacationersRouter.put("/:vacationerId/undelete", (req, res, next) => {
-    Vacationer.findByIdAndUpdate(
-        req.params.vacationerId,
-        { $unset: { deletedAt: 1 } },
-        { new: true, runValidators: true, context: "query" }
-    )
-        .then((returnedVacationer) => {
-            res.status(200).json(returnedVacationer);
-        })
-        .catch((error) => next(error));
-});
+vacationersRouter.put(
+    "/:vacationerId/undelete",
+    [isAdmin()],
+    (req, res, next) => {
+        Vacationer.findByIdAndUpdate(
+            req.params.vacationerId,
+            { $unset: { deletedAt: 1 } },
+            { new: true, runValidators: true, context: "query" }
+        )
+            .then((returnedVacationer) => {
+                res.status(200).json(returnedVacationer);
+            })
+            .catch((error) => next(error));
+    }
+);
 
 /**
  * @openapi
@@ -641,10 +660,12 @@ vacationersRouter.put("/:vacationerId/undelete", (req, res, next) => {
  *                          $ref: "#/components/schemas/vacationer"
  *          401:
  *              description: Unauthenticated user
+ *          403:
+ *              description: Access denied. The user does not have admin rights
  *          500:
  *              description: Internal server error
  */
-vacationersRouter.delete("/:vacationerId", (req, res, next) => {
+vacationersRouter.delete("/:vacationerId", [isAdmin()], (req, res, next) => {
     Vacationer.findByIdAndRemove(req.params.vacationerId)
         .then((deletedVacationer) => {
             console.log("Deleted user", req.params.vacationerId);
