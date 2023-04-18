@@ -15,7 +15,9 @@ const { isAdmin } = require("../utils/middleware");
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: "#/components/schemas/team"
+ *                          type: array
+ *                          items:
+ *                              $ref: "#/components/schemas/team"
  *          401:
  *              description: Unauthenticated user
  *          500:
@@ -25,6 +27,35 @@ teamsRouter.get("/", (req, res, next) => {
     Team.find({ deletedAt: { $exists: false } })
         .then((team) => {
             res.status(200).json(team);
+        })
+        .catch((error) => next(error));
+});
+
+/**
+ * @openapi
+ * /teams/all:
+ *  get:
+ *      tags: ["team"]
+ *      summary: Get all the teams (also deleted)
+ *      description: Get all the teams (also deleted)
+ *      responses:
+ *          200:
+ *              description: Return all teams (also deleted)
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              $ref: "#/components/schemas/team"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
+teamsRouter.get("/all", (req, res, next) => {
+    Team.find({})
+        .then((teams) => {
+            res.status(200).json(teams);
         })
         .catch((error) => next(error));
 });
@@ -42,7 +73,9 @@ teamsRouter.get("/", (req, res, next) => {
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: "#/components/schemas/team"
+ *                          type: array
+ *                          items:
+ *                              $ref: "#/components/schemas/team"
  *          401:
  *              description: Unauthenticated user
  *          500:
@@ -61,7 +94,7 @@ teamsRouter.get("/deleted", (req, res, next) => {
  * /teams:
  *  post:
  *      tags: ["team"]
- *      summary: Create new team (TODO request id field is extra, vacationerId needed)
+ *      summary: Create new team (TODO request body's id field is extra)
  *      description: Create new team
  *      requestBody:
  *          required: true
@@ -515,7 +548,7 @@ teamsRouter.put("/:id/undelete", [isAdmin()], (req, res, next) => {
  *          401:
  *              description: Unauthenticated user
  *          403:
- *              description: Access denied. The user does not have admin rights 
+ *              description: Access denied. The user does not have admin rights
  *          500:
  *              description: Internal server error
  */
