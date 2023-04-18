@@ -31,6 +31,33 @@ teamsRouter.get("/", (req, res, next) => {
 
 /**
  * @openapi
+ * /teams:
+ *  get:
+ *      tags: ["team"]
+ *      summary: Get all the teams
+ *      description: Get all the teams
+ *      responses:
+ *          200:
+ *              description: Return all teams
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: "#/components/schemas/team"
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
+teamsRouter.get("/all", (req, res, next) => {
+    Team.find({})
+        .then((teams) => {
+            res.status(200).json(teams);
+        })
+        .catch((error) => next(error));
+});
+
+/**
+ * @openapi
  * /teams/deleted:
  *  get:
  *      tags: ["team"]
@@ -515,7 +542,7 @@ teamsRouter.put("/:id/undelete", [isAdmin()], (req, res, next) => {
  *          401:
  *              description: Unauthenticated user
  *          403:
- *              description: Access denied. The user does not have admin rights 
+ *              description: Access denied. The user does not have admin rights
  *          500:
  *              description: Internal server error
  */
