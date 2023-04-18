@@ -1,7 +1,7 @@
 const vacationersRouter = require("express").Router();
 const Vacationer = require("../models/vacationer");
 const { isAdmin } = require("../utils/middleware");
-// TODO: For the swagger, add vacation body structures. Add these for body of POST /vacationers
+// TODO: For the swagger, add vacation body structure. Add it for body of POST /vacationers
 // -  in: path
 // name: name
 // description: Username in the application
@@ -14,7 +14,7 @@ const { isAdmin } = require("../utils/middleware");
 // schema:
 //     type: string
 // required: true
-//TODO: Should this be deleted?
+//TODO: Is the endpoint needed?
 /**
  * @openapi
  * /vacationers:
@@ -45,7 +45,7 @@ vacationersRouter.get("/", (req, res, next) => {
         .catch((error) => next(error));
 });
 
-//TODO: Should this be deleted?
+//TODO: Is the endpoint needed?
 /**
  * @openapi
  * /vacationers/allUsers:

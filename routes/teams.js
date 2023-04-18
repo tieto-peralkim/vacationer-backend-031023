@@ -15,7 +15,9 @@ const { isAdmin } = require("../utils/middleware");
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: "#/components/schemas/team"
+ *                          type: array
+ *                          items:
+ *                              $ref: "#/components/schemas/team"
  *          401:
  *              description: Unauthenticated user
  *          500:
@@ -31,18 +33,20 @@ teamsRouter.get("/", (req, res, next) => {
 
 /**
  * @openapi
- * /teams:
+ * /teams/all:
  *  get:
  *      tags: ["team"]
- *      summary: Get all the teams
- *      description: Get all the teams
+ *      summary: Get all the teams (also deleted)
+ *      description: Get all the teams (also deleted)
  *      responses:
  *          200:
- *              description: Return all teams
+ *              description: Return all teams (also deleted)
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: "#/components/schemas/team"
+ *                          type: array
+ *                          items:
+ *                              $ref: "#/components/schemas/team"
  *          401:
  *              description: Unauthenticated user
  *          500:
@@ -69,7 +73,9 @@ teamsRouter.get("/all", (req, res, next) => {
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: "#/components/schemas/team"
+ *                          type: array
+ *                          items:
+ *                              $ref: "#/components/schemas/team"
  *          401:
  *              description: Unauthenticated user
  *          500:
@@ -88,7 +94,7 @@ teamsRouter.get("/deleted", (req, res, next) => {
  * /teams:
  *  post:
  *      tags: ["team"]
- *      summary: Create new team (TODO request id field is extra, vacationerId needed)
+ *      summary: Create new team (TODO request body's id field is extra)
  *      description: Create new team
  *      requestBody:
  *          required: true
