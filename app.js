@@ -48,13 +48,15 @@ const cronSlackSchedule = "0 6 * * 1";
 // Daily at 1 UTC time
 const cronRemoveDataSchedule = "0 1 * * *";
 
-cron.schedule(cronSlackSchedule, () => {
-    console.log(
-        "Weekly cron: Sending  Slack message, schedule:",
-        cronSlackSchedule
-    );
-    sendSlackMessage();
-});
+if (process.env.REACT_APP_ENVIRONMENT === "production") {
+    cron.schedule(cronSlackSchedule, () => {
+        console.log(
+            "Weekly cron: Sending  Slack message, schedule:",
+            cronSlackSchedule
+        );
+        sendSlackMessage();
+    });
+}
 
 cron.schedule(cronRemoveDataSchedule, () => {
     console.log(
