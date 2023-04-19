@@ -1,3 +1,5 @@
+"use strict";
+
 const fetcher = require("./fetcher.js");
 
 // Creates the array of dates with vacationer numbers

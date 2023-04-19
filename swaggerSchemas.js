@@ -1,3 +1,5 @@
+"use strict";
+
 const m2s = require("mongoose-to-swagger");
 
 const Vacationer = require("./models/vacationer");

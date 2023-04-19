@@ -1,3 +1,5 @@
+"use strict";
+
 const vacationersRouter = require("express").Router();
 const Vacationer = require("../models/vacationer");
 const { isAdmin } = require("../utils/middleware");

@@ -1,3 +1,5 @@
+"use strict";
+
 const timeframesRouter = require("express").Router();
 const handleVacationData = require("../functions/handler");
 const fetcher = require("../functions/fetcher.js");

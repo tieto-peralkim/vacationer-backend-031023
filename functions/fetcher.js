@@ -1,3 +1,5 @@
+"use strict";
+
 const Vacationer = require("../models/vacationer");
 
 // Returns vacationers and their holidays between start and end dates
@@ -13,7 +15,7 @@ async function fetchVacationsBetween(start, end) {
                 $and: [
                     {
                         deletedAt: {
-                            $exists: false
+                            $exists: false,
                         },
                     },
                     {
@@ -46,7 +48,7 @@ async function fetchVacationerAmount(start, end) {
                 $and: [
                     {
                         deletedAt: {
-                            $exists: false
+                            $exists: false,
                         },
                     },
                     {

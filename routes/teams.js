@@ -1,3 +1,5 @@
+"use strict";
+
 const teamsRouter = require("express").Router();
 const Team = require("../models/team");
 const { isAdmin } = require("../utils/middleware");

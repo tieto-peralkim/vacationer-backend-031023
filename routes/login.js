@@ -1,3 +1,5 @@
+"use strict";
+
 const axios = require("axios");
 const loginRouter = require("express").Router();
 require("dotenv").config();

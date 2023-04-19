@@ -1,3 +1,5 @@
+"use strict";
+
 const slackRouter = require("express").Router();
 const sendSlackMessage = require("../functions/slack");
 /**
