@@ -43,45 +43,33 @@ server.listen(3001, () => {
     console.log(`Server running on port 3001`);
 });
 
-// At 13 every Monday = "0 13 * * 1"
-const cronSlackSchedule = "0 13 * * 1";
-// Daily at 3 am = "0 3 * * *"
-const cronRemoveDataSchedule = "0 3 * * *";
+// Weekly on Monday at 6 UTC time
+const cronSlackSchedule = "0 6 * * 1";
+// Daily at 1 UTC time
+const cronRemoveDataSchedule = "0 1 * * *";
 
-cron.schedule(
-    cronSlackSchedule,
-    () => {
-        console.log(
-            "Weekly cron: Sending  Slack message, schedule:",
-            cronSlackSchedule
-        );
-        sendSlackMessage();
-    },
-    {
-        timezone: "Europe/Helsinki",
-    }
-);
+cron.schedule(cronSlackSchedule, () => {
+    console.log(
+        "Weekly cron: Sending  Slack message, schedule:",
+        cronSlackSchedule
+    );
+    sendSlackMessage();
+});
 
-cron.schedule(
-    cronRemoveDataSchedule,
-    () => {
-        console.log(
-            "Daily cron: Removing vacationers and teams over 1 month old, schedule",
-            cronRemoveDataSchedule
-        );
-        remover
-            .removeDeletableData()
-            .then((response) => {
-                console.log("Done removing data");
-            })
-            .catch((error) => {
-                console.error("removeData error: ", error);
-            });
-    },
-    {
-        timezone: "Europe/Helsinki",
-    }
-);
+cron.schedule(cronRemoveDataSchedule, () => {
+    console.log(
+        "Daily cron: Removing vacationers and teams over 1 month old, schedule",
+        cronRemoveDataSchedule
+    );
+    remover
+        .removeDeletableData()
+        .then((response) => {
+            console.log("Done removing data");
+        })
+        .catch((error) => {
+            console.error("removeData error: ", error);
+        });
+});
 
 const connectToMongoDB = (path) => {
     if (!path) {
