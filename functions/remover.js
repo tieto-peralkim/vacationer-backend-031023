@@ -1,3 +1,5 @@
+"use strict";
+
 const Vacationer = require("../models/vacationer");
 const Team = require("../models/team");
 

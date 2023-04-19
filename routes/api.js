@@ -1,3 +1,5 @@
+"use strict";
+
 const express = require("express");
 const vacationsRouter = require("./vacationers");
 const teamsRouter = require("./teams");

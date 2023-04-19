@@ -1,3 +1,5 @@
+"use strict";
+
 const fetcher = require("./fetcher.js");
 const handleVacationData = require("./handler");
 const axios = require("axios");
