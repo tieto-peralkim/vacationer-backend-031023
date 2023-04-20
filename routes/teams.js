@@ -130,15 +130,9 @@ teamsRouter.post("/", (req, res, next) => {
             res.status(201).json(savedTeam);
         })
         .catch((error) => {
-            // if (error.code === 11000) {
-            //     console.log("here");
-            //     res.status(409).send("This team title is already taken!");
-            // } else {
-            //     console.log("else");
-            // }
             next(error);
         });
-    });
+});
 
 /**
  * @openapi
