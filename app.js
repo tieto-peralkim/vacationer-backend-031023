@@ -58,20 +58,25 @@ if (process.env.REACT_APP_ENVIRONMENT === "production") {
     });
 }
 
-cron.schedule(cronRemoveDataSchedule, () => {
-    console.log(
-        "Daily cron: Removing vacationers and teams over 1 month old, schedule",
-        cronRemoveDataSchedule
-    );
-    remover
-        .removeDeletableData()
-        .then((response) => {
-            console.log("Done removing data");
-        })
-        .catch((error) => {
-            console.error("removeData error: ", error);
-        });
-});
+if (
+    process.env.REACT_APP_ENVIRONMENT === "production" ||
+    process.env.REACT_APP_ENVIRONMENT === "qa"
+) {
+    cron.schedule(cronRemoveDataSchedule, () => {
+        console.log(
+            "Daily cron: Removing vacationers and teams over 1 month old, schedule",
+            cronRemoveDataSchedule
+        );
+        remover
+            .removeDeletableData()
+            .then((response) => {
+                console.log("Done removing data");
+            })
+            .catch((error) => {
+                console.error("removeData error: ", error);
+            });
+    });
+}
 
 const connectToMongoDB = (path) => {
     if (!path) {

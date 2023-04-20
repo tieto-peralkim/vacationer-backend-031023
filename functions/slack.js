@@ -5,18 +5,50 @@ const handleVacationData = require("./handler");
 const axios = require("axios");
 
 const getNextWeekDates = () => {
-    let nextMonday = new Date();
-    nextMonday.setUTCDate(
-        nextMonday.getUTCDate() + ((1 + 7 - nextMonday.getUTCDay()) % 7 || 7)
+    let thisMonday = new Date();
+    thisMonday.setUTCDate(
+        thisMonday.getUTCDate() - ((thisMonday.getUTCDay() + 6) % 7)
     );
-    nextMonday.setUTCHours(0, 0, 0, 0);
+    thisMonday.setUTCHours(12, 0, 0, 0);
+    console.log("thisMonday", thisMonday);
 
-    let nextFriday = new Date();
-    nextFriday.setTime(nextMonday.getTime() + 4 * 24 * 60 * 60 * 1000);
-    nextFriday.setUTCHours(0, 0, 0, 0);
+    let nextWeekFriday = new Date();
+    nextWeekFriday.setTime(thisMonday.getTime() + 11 * 24 * 60 * 60 * 1000);
+    nextWeekFriday.setUTCHours(12, 0, 0, 0);
 
-    return { nextMonday, nextFriday };
+    return { thisMonday, nextWeekFriday };
 };
+
+function messageText(vacationers, days) {
+    return `🌴 *Tulevina viikkoina ${vacationers} lomalaista.*\n\n*Tällä viikolla:*
+                \n>ma ${new Date(days[0][0]).toLocaleDateString("fi-FI")}  ${
+        days[0][1]
+    } - ${days[0][2]}\n>ti ${new Date(days[1][0]).toLocaleDateString(
+        "fi-FI"
+    )}  ${days[1][1]} - ${days[1][2]}\n>ke ${new Date(
+        days[2][0]
+    ).toLocaleDateString("fi-FI")}  ${days[2][1]} - ${
+        days[2][2]
+    }\n>to ${new Date(days[3][0]).toLocaleDateString("fi-FI")}  ${
+        days[3][1]
+    } - ${days[3][2]}\n>pe ${new Date(days[4][0]).toLocaleDateString(
+        "fi-FI"
+    )}  ${days[4][1]} - ${days[4][2]}
+                \n*Ensi viikolla:*
+                \n>ma ${new Date(days[7][0]).toLocaleDateString("fi-FI")}  ${
+        days[7][1]
+    } - ${days[7][2]}\n>ti ${new Date(days[8][0]).toLocaleDateString(
+        "fi-FI"
+    )}  ${days[8][1]} - ${days[8][2]}\n>ke ${new Date(
+        days[9][0]
+    ).toLocaleDateString("fi-FI")}  ${days[9][1]} - ${
+        days[9][2]
+    }\n>to ${new Date(days[10][0]).toLocaleDateString("fi-FI")}  ${
+        days[10][1]
+    } - ${days[10][2]}\n>pe ${new Date(days[11][0]).toLocaleDateString(
+        "fi-FI"
+    )}  ${days[11][1]} - ${days[11][2]}`;
+}
 
 const slackMessage = (vacationerAmount, weekList) => {
     for (let i = 0; i < weekList.length; i++) {
@@ -28,22 +60,7 @@ const slackMessage = (vacationerAmount, weekList) => {
         .post(
             process.env.REACT_APP_SLACK_URI,
             JSON.stringify({
-                text: `Ensi viikolla yhteensä ${vacationerAmount} lomalaista:
-                ma ${new Date(weekList[0][0]).toLocaleDateString("fi-FI")}  ${
-                    weekList[0][1]
-                } - ${weekList[0][2]}
-                ti ${new Date(weekList[1][0]).toLocaleDateString("fi-FI")}  ${
-                    weekList[1][1]
-                } - ${weekList[1][2]}
-                ke ${new Date(weekList[2][0]).toLocaleDateString("fi-FI")}  ${
-                    weekList[2][1]
-                } - ${weekList[2][2]}
-                to ${new Date(weekList[3][0]).toLocaleDateString("fi-FI")}  ${
-                    weekList[3][1]
-                } - ${weekList[3][2]}
-                pe ${new Date(weekList[4][0]).toLocaleDateString("fi-FI")}  ${
-                    weekList[4][1]
-                } - ${weekList[4][2]}`,
+                text: messageText(vacationerAmount, weekList),
             })
         )
         .then((response) => {
@@ -59,17 +76,17 @@ const sendSlackMessage = () => {
     let vacationersPerDay = [];
 
     let nextWeekDates = getNextWeekDates();
-    let nextMonday = nextWeekDates.nextMonday;
-    let nextFriday = nextWeekDates.nextFriday;
+    let thisMonday = nextWeekDates.thisMonday;
+    let nextWeekFriday = nextWeekDates.nextWeekFriday;
 
-    console.log("nextMonday ", nextMonday);
-    console.log("nextFriday ", nextFriday);
+    console.log("thisMonday ", thisMonday);
+    console.log("nextWeekFriday ", nextWeekFriday);
 
     fetcher
-        .fetchVacationerAmount(nextMonday, nextFriday)
+        .fetchVacationerAmount(thisMonday, nextWeekFriday)
         .then((response) => {
             numberOfVacationers = response.length;
-            handleVacationData(nextMonday, nextFriday)
+            handleVacationData(thisMonday, nextWeekFriday)
                 .then((response) => {
                     vacationersPerDay = response;
                     slackMessage(numberOfVacationers, vacationersPerDay);

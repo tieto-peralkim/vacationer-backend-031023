@@ -3,11 +3,10 @@
 const Vacationer = require("../models/vacationer");
 const Team = require("../models/team");
 
-// Deleting data set to be removed
+// Deleting data to be removed
 async function removeDeletableData() {
     let monthAgo = new Date();
     monthAgo.setMonth(monthAgo.getMonth() - 1);
-    monthAgo.setUTCHours(0, 0, 0, 0);
 
     let selectedLimit = monthAgo;
 
