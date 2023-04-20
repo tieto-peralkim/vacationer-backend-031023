@@ -193,13 +193,7 @@ vacationersRouter.get("/getById/:nameId", (req, res, next) => {
                     .catch((error) => {
                         console.error(error);
                         console.error("Error code:", error.code);
-                        if (error.code === 11000) {
-                            return res
-                                .status(409)
-                                .json("This username is already taken!");
-                        } else {
-                            next(error);
-                        }
+                        next(error);
                     });
             } else {
                 return res.status(200).json(foundVacationer);
@@ -280,10 +274,8 @@ vacationersRouter.post("/", (req, res, next) => {
             res.status(201).json(savedVacationer);
         })
         .catch((error) => {
-            console.error(error);
-            console.error("Error code:", error.code);
             if (error.code === 11000) {
-                res.status(409).json("This username is already taken!");
+                res.status(409).send("This username is already taken!");
             } else {
                 next(error);
             }
@@ -322,6 +314,8 @@ vacationersRouter.post("/", (req, res, next) => {
  *                          $ref: "#/components/schemas/vacationer"
  *          401:
  *              description: Unauthenticated user
+ *          409:
+ *              description: User with the same name already exists
  *          500:
  *              description: Internal server error
  */
@@ -339,7 +333,13 @@ vacationersRouter.patch("/:vacationerId", (req, res, next) => {
         .then((updatedUser) => {
             res.status(200).json(updatedUser);
         })
-        .catch((error) => next(error));
+        .catch((error) => {
+            if (error.code === 11000) {
+                res.status(409).send("This username is already taken!");
+            } else {
+                next(error);
+            }
+        });
 });
 
 /**
