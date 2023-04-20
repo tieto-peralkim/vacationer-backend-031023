@@ -9,7 +9,6 @@ const teamSchema = new mongoose.Schema(
             type: String,
             minlength: 3,
             required: true,
-            unique: false,
             description: "Name of the team",
         },
         deletedAt: {
