@@ -3,34 +3,6 @@
 const mongoose = require("mongoose");
 mongoose.set("useFindAndModify", false);
 
-const calendarSettingsSchema = new mongoose.Schema({
-    _id: false,
-    holidayColor: {
-        type: String,
-        default: "#73D8FF",
-    },
-    unConfirmedHolidayColor: {
-        type: String,
-        default: "#68CCCA",
-    },
-    weekendColor: {
-        type: String,
-        default: "#808080",
-    },
-    weekendHolidayColor: {
-        type: String,
-        default: "#CCCCCC",
-    },
-    holidaySymbol: {
-        type: String,
-        default: "X",
-    },
-    unConfirmedHolidaySymbol: {
-        type: String,
-        default: "Y",
-    },
-});
-
 const vacationerSchema = new mongoose.Schema(
     {
         name: {
@@ -52,7 +24,18 @@ const vacationerSchema = new mongoose.Schema(
             description: "Admin flag",
         },
         calendarSettings: {
-            type: [calendarSettingsSchema],
+            type: Array,
+            default: [
+                {
+                    _id: false,
+                    holidayColor: "#73D8FF",
+                    unConfirmedHolidayColor: "#68CCCA",
+                    weekendColor: "#808080",
+                    weekendHolidayColor: "#CCCCCC",
+                    holidaySymbol: "X",
+                    unConfirmedHolidaySymbol: "Y",
+                },
+            ],
             description: "Calendar colors and symbols",
         },
         vacations: [
