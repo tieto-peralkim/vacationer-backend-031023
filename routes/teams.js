@@ -130,10 +130,7 @@ teamsRouter.post("/", (req, res, next) => {
             res.status(201).json(savedTeam);
         })
         .catch((error) => {
-            if (error.code === 11000) {
-                res.status(409).json("This team title is already taken!");
-                next(error);
-            }
+            next(error);
         });
 });
 
