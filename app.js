@@ -1,7 +1,6 @@
 "use strict";
 
 const express = require("express");
-const morgan = require("morgan");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
@@ -29,7 +28,6 @@ const mongoose = require("mongoose");
 const cron = require("node-cron");
 const mongoUri = process.env.REACT_APP_MONGODB_URI;
 
-app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
 
 app.use(middleWare.unknownEndpoint);
