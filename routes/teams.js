@@ -224,7 +224,7 @@ teamsRouter.post("/:id", (req, res, next) => {
         Team.findByIdAndUpdate(
             teamId,
             { $addToSet: { members: newMember } },
-            { upsert: true, runValidators: true, context: "query" }
+            { upsert: true, runValidators: true }
         )
             .then(() => {
                 console.log(newMember.name, "added to", teamId);
@@ -283,7 +283,7 @@ teamsRouter.patch("/:id", (req, res, next) => {
     Team.findByIdAndUpdate(
         teamId,
         { $set: { title: newName } },
-        { new: true, runValidators: true, context: "query" }
+        { new: true, runValidators: true }
     )
         .then((updatedTeam) => {
             res.status(200).json(updatedTeam);
@@ -474,7 +474,7 @@ teamsRouter.put("/:id/delete", (req, res, next) => {
     Team.findByIdAndUpdate(
         req.params.id,
         { $set: { deletedAt: new Date() } },
-        { new: true, runValidators: true, context: "query" }
+        { new: true, runValidators: true }
     )
         .then((deletedTeam) => {
             console.log("delete", deletedTeam);
@@ -515,7 +515,7 @@ teamsRouter.put("/:id/undelete", [isAdmin()], (req, res, next) => {
     Team.findByIdAndUpdate(
         req.params.id,
         { $unset: { deletedAt: 1 } },
-        { new: true, runValidators: true, context: "query" }
+        { new: true, runValidators: true }
     )
         .then((returnedTeam) => {
             res.status(200).json(returnedTeam);
