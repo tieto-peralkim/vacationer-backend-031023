@@ -1,7 +1,6 @@
 "use strict";
 
 const express = require("express");
-const morgan = require("morgan");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
@@ -29,7 +28,6 @@ const mongoose = require("mongoose");
 const cron = require("node-cron");
 const mongoUri = process.env.REACT_APP_MONGODB_URI;
 
-app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
 
 app.use(middleWare.unknownEndpoint);
@@ -83,9 +81,13 @@ const connectToMongoDB = (path) => {
         console.log("MongoDB path not found, no database connection");
         return;
     }
-    console.log("Connecting to mongodb", path.split("@")[1]);
+    if (process.env.REACT_APP_ENVIRONMENT === "local") {
+        console.log("Connecting to mongodb", path);
+    } else {
+        console.log("Connecting to mongodb", path.split("@")[1]);
+    }
     mongoose
-        .connect(path, { useNewUrlParser: true, useUnifiedTopology: true })
+        .connect(path)
         .then(() => {
             let admin = new mongoose.mongo.Admin(mongoose.connection.db);
             admin.buildInfo(function (err, info) {

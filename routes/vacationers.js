@@ -328,7 +328,7 @@ vacationersRouter.patch("/:vacationerId", (req, res, next) => {
     Vacationer.findByIdAndUpdate(
         userId,
         { $set: { name: newName } },
-        { new: true, runValidators: true, context: "query" }
+        { new: true, runValidators: true }
     )
         .then((updatedUser) => {
             res.status(200).json(updatedUser);
@@ -411,7 +411,7 @@ vacationersRouter.patch("/:vacationerId/calendarSettings", (req, res, next) => {
     Vacationer.findByIdAndUpdate(
         userId,
         { $set: { calendarSettings: newCalendarSettings } },
-        { new: true, runValidators: true, context: "query" }
+        { new: true, runValidators: true }
     )
         .then((updatedUser) => {
             res.status(200).json(updatedUser);
@@ -466,7 +466,7 @@ vacationersRouter.patch(
         Vacationer.findByIdAndUpdate(
             userId,
             { $set: { admin: adminRole } },
-            { new: true, runValidators: true, context: "query" }
+            { new: true, runValidators: true }
         )
             .then((updatedUser) => {
                 res.status(200).json(updatedUser);
@@ -546,7 +546,7 @@ vacationersRouter.post("/:vacationerId/calendarSettings", (req, res, next) => {
     Vacationer.findByIdAndUpdate(
         userId,
         { $push: { calendarSettings: newCalendarSettings } },
-        { new: true, runValidators: true, context: "query" }
+        { new: true, runValidators: true }
     )
         .then((updatedUser) => {
             res.status(200).json(updatedUser);
@@ -588,7 +588,7 @@ vacationersRouter.put(
         Vacationer.findByIdAndUpdate(
             req.params.vacationerId,
             { $set: { deletedAt: new Date() } },
-            { new: true, runValidators: true, context: "query" }
+            { new: true, runValidators: true }
         )
             .then((deletedVacationer) => {
                 res.status(200).json(deletedVacationer);
@@ -631,7 +631,7 @@ vacationersRouter.put(
         Vacationer.findByIdAndUpdate(
             req.params.vacationerId,
             { $unset: { deletedAt: 1 } },
-            { new: true, runValidators: true, context: "query" }
+            { new: true, runValidators: true }
         )
             .then((returnedVacationer) => {
                 res.status(200).json(returnedVacationer);
@@ -723,7 +723,7 @@ vacationersRouter.post("/:vacationerId", (req, res, next) => {
     Vacationer.findByIdAndUpdate(
         vacationerId,
         { $push: { vacations: newHoliday } },
-        { new: true, runValidators: true, context: "query" }
+        { new: true, runValidators: true }
     )
         .then((updatedVacationer) => {
             res.status(200).json(updatedVacationer);

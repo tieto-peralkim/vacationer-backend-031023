@@ -1,7 +1,6 @@
 "use strict";
 
 const mongoose = require("mongoose");
-mongoose.set("useFindAndModify", false);
 
 const teamSchema = new mongoose.Schema(
     {
