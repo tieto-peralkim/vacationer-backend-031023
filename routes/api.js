@@ -21,7 +21,7 @@ const servers = [
         description: "QA",
     },
     {
-        url: "https://vacationer.kube.cem.ninja/api",
+        url: "https://vacationer.cem.ninja/api",
         description: "PROD",
     },
 ];
