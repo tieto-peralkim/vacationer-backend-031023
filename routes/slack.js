@@ -2,6 +2,7 @@
 
 const slackRouter = require("express").Router();
 const sendSlackMessage = require("../functions/slack");
+const { isAdmin } = require("../utils/middleware");
 /**
  * @openapi
  * /slackMessageSender:
@@ -17,10 +18,12 @@ const sendSlackMessage = require("../functions/slack");
  *                      schema:
  *          401:
  *              description: Unauthenticated user
+ *          403:
+ *              description: Access denied. The user does not have admin rights
  *          500:
  *              description: Internal server error
  */
-slackRouter.get("/slackMessageSender", (req, res, next) => {
+slackRouter.get("/slackMessageSender", [isAdmin()], (req, res, next) => {
     sendSlackMessage();
     res.status(200).send("Slack query sent");
 });
