@@ -259,6 +259,8 @@ vacationersRouter.get("/:vacationerId", (req, res, next) => {
  *                          $ref: "#/components/schemas/vacationer"
  *          401:
  *              description: Unauthenticated user
+ *          403:
+ *              description: Access denied. The user does not have admin rights
  *          409:
  *              description: When trying to create a new user, user name already taken
  *          422:
@@ -266,7 +268,7 @@ vacationersRouter.get("/:vacationerId", (req, res, next) => {
  *          500:
  *              description: Internal server error
  */
-vacationersRouter.post("/", (req, res, next) => {
+vacationersRouter.post("/", [isAdmin()], (req, res, next) => {
     const body = req.body;
     const VacationerObject = new Vacationer(body);
     VacationerObject.save()
