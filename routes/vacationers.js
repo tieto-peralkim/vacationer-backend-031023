@@ -3,7 +3,7 @@
 const vacationersRouter = require("express").Router();
 const Vacationer = require("../models/vacationer");
 const { isAdmin } = require("../utils/middleware");
-const maxNameLength = 10;
+const maxNameLength = 12;
 const minNameLength = 3;
 
 // TODO: For the swagger, add vacation body structure. Add it for body of POST /vacationers
