@@ -3,6 +3,9 @@
 const vacationersRouter = require("express").Router();
 const Vacationer = require("../models/vacationer");
 const { isAdmin } = require("../utils/middleware");
+const maxNameLength = 10;
+const minNameLength = 3;
+
 // TODO: For the swagger, add vacation body structure. Add it for body of POST /vacationers
 // -  in: path
 // name: name
@@ -164,6 +167,8 @@ vacationersRouter.get("/total", (req, res, next) => {
  *                          $ref: "#/components/schemas/vacationer"
  *          201:
  *              description: User not found, created a new user successfully
+ *          400:
+ *              description: Username too short
  *          401:
  *              description: Unauthenticated user
  *          409:
@@ -172,14 +177,25 @@ vacationersRouter.get("/total", (req, res, next) => {
  *              description: Internal server error
  */
 vacationersRouter.get("/getById/:nameId", (req, res, next) => {
-    let newName = req.params.nameId;
+    let newNameId = req.params.nameId;
 
-    Vacationer.find({ nameId: newName })
+    Vacationer.find({ nameId: newNameId })
         .then((foundVacationer) => {
             if (!foundVacationer.length) {
-                console.log("User does not exist, creating a user:", newName);
+                console.log("User does not exist, creating a user:", newNameId);
 
-                let userInfo = { name: newName, nameId: newName };
+                let newName = newNameId;
+                if (newNameId.length < minNameLength) {
+                    return res
+                        .status(400)
+                        .json(`Username under ${minNameLength} characters`);
+                }
+
+                if (newNameId.length > maxNameLength) {
+                    newName = newName.slice(0, maxNameLength);
+                }
+
+                let userInfo = { name: newName, nameId: newNameId };
 
                 console.log("userInfo", userInfo);
                 let newUser = new Vacationer(userInfo);
@@ -241,7 +257,7 @@ vacationersRouter.get("/:vacationerId", (req, res, next) => {
  * /vacationers:
  *  post:
  *      tags: ["vacationer"]
- *      summary: Add a vacationer (TODO id field is extra)
+ *      summary: Add a vacationer (TODO id, deletedAt fields and fields inside vacations are extra)
  *      description: Add a vacationer
  *      requestBody:
  *          required: true
@@ -257,6 +273,8 @@ vacationersRouter.get("/:vacationerId", (req, res, next) => {
  *                  application/json:
  *                      schema:
  *                          $ref: "#/components/schemas/vacationer"
+ *          400:
+ *              description: Username wrong length
  *          401:
  *              description: Unauthenticated user
  *          409:
@@ -268,18 +286,28 @@ vacationersRouter.get("/:vacationerId", (req, res, next) => {
  */
 vacationersRouter.post("/", (req, res, next) => {
     const body = req.body;
-    const VacationerObject = new Vacationer(body);
-    VacationerObject.save()
-        .then((savedVacationer) => {
-            res.status(201).json(savedVacationer);
-        })
-        .catch((error) => {
-            if (error.code === 11000) {
-                res.status(409).send("This username is already taken!");
-            } else {
-                next(error);
-            }
-        });
+
+    if (
+        body.name.length <= maxNameLength &&
+        body.name.length >= minNameLength
+    ) {
+        const VacationerObject = new Vacationer(body);
+        VacationerObject.save()
+            .then((savedVacationer) => {
+                res.status(201).json(savedVacationer);
+            })
+            .catch((error) => {
+                if (error.code === 11000) {
+                    res.status(409).send("This username is already taken!");
+                } else {
+                    next(error);
+                }
+            });
+    } else {
+        res.status(400).json(
+            `Username not between ${minNameLength}-${maxNameLength} characters`
+        );
+    }
 });
 
 /**
@@ -312,6 +340,8 @@ vacationersRouter.post("/", (req, res, next) => {
  *                  application/json:
  *                      schema:
  *                          $ref: "#/components/schemas/vacationer"
+ *          400:
+ *              description: Username wrong length
  *          401:
  *              description: Unauthenticated user
  *          409:
@@ -325,21 +355,27 @@ vacationersRouter.patch("/:vacationerId", (req, res, next) => {
 
     console.log("Changing user:", userId, " ", "name to", newName);
 
-    Vacationer.findByIdAndUpdate(
-        userId,
-        { $set: { name: newName } },
-        { new: true, runValidators: true }
-    )
-        .then((updatedUser) => {
-            res.status(200).json(updatedUser);
-        })
-        .catch((error) => {
-            if (error.code === 11000) {
-                res.status(409).send("This username is already taken!");
-            } else {
-                next(error);
-            }
-        });
+    if (newName.length <= maxNameLength && newName.length >= minNameLength) {
+        Vacationer.findByIdAndUpdate(
+            userId,
+            { $set: { name: newName } },
+            { new: true, runValidators: true }
+        )
+            .then((updatedUser) => {
+                res.status(200).json(updatedUser);
+            })
+            .catch((error) => {
+                if (error.code === 11000) {
+                    res.status(409).send("This username is already taken!");
+                } else {
+                    next(error);
+                }
+            });
+    } else {
+        res.status(400).json(
+            `Username not between ${minNameLength}-${maxNameLength} characters`
+        );
+    }
 });
 
 /**
