@@ -1,7 +1,7 @@
 # Vacationer API
 
 ## API Documentation
-Swagger (you need to be signed in to Vacationer):
+Swagger (you need to be logged in to Vacationer):
 - endpoint <BACKEND_ADDRESS>/api-docs, e.g. http://localhost:3001/api-docs
 
 ## Development instructions
@@ -29,6 +29,5 @@ npm start
 ```
 - Consume the API with http://localhost:3001/<ENDPOINT>
 
-## Deployments
-* QA: When PR has been merged, deployment starts automatically.
-* PROD: Adding a tag starts the deployment. Add same tag to both backend and frontend repos. Latest tags: https://github.com/tieto-cem/vacationer-backend/tags
+## Documentation
+https://tietoevry-experience.atlassian.net/wiki/spaces/SUP/pages/3824844801/Vacationer+Lomasovellus
