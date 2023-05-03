@@ -11,7 +11,7 @@ docker rm vacationer-"$INSTANCE";
 echo "Run the new $INSTANCE image"
 PORTS=3001:3001
 ENV0="REACT_APP_ENVIRONMENT=qa"
-ENV1="REACT_APP_MONGODB_URI=mongodb://$1@docdb-2023-05-03-05-51-36.c9qzwnhx4tes.eu-west-1.docdb.amazonaws.com:27017/vacationer-app-database?tls=true&tlsCAFile=rds-combined-ca-bundle.pem&retryWrites=false"
+ENV1="REACT_APP_MONGODB_URI=mongodb://$1@docdb-sandbox.cluster-c9qzwnhx4tes.eu-west-1.docdb.amazonaws.com:27017/vacationer-app-database?tls=true&tlsCAFile=rds-combined-ca-bundle.pem&retryWrites=false"
 ENV2=(REACT_APP_SLACK_URI="$2")
 ENV3=(REACT_APP_GHUB_ID="$3")
 ENV4=(REACT_APP_GHUB_SECRET="$4")
