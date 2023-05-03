@@ -3,6 +3,9 @@
 const timeframesRouter = require("express").Router();
 const handleVacationData = require("../functions/handler");
 const fetcher = require("../functions/fetcher.js");
+const axios = require("axios")
+
+const publicHolidays = []
 
 /**
  * @openapi
@@ -92,6 +95,40 @@ timeframesRouter.get("/timespan", (req, res, next) => {
             res.status(200).json(vacationer);
         })
         .catch((error) => next(error));
+});
+
+timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
+    let year = req.params.year;
+    console.log(year);
+
+    axios
+        .get(
+            `https://date.nager.at/api/v3/publicholidays/${year}/FI`
+        )
+        .then((response) => {
+            let publicDays = [];
+            for (let i = 0; i < response.data.length; i++) {
+                let publicDay = {};
+                publicDay["month"] = parseInt(
+                    response.data[i].date.slice(5, 7)
+                );
+                publicDay["day"] = parseInt(
+                    response.data[i].date.slice(8, 10)
+                );
+                publicDays.push(publicDay);
+            }
+
+            publicHolidays.push({year: year, holidays: publicDays})
+
+            console.log("publicDays", publicHolidays);
+            res.status(200).send(publicDays);
+
+        })
+        .catch((error) => {
+            res.status(200).send("publicDays");
+
+            console.error("There was a Public holiday API error!", error);
+        });
 });
 
 module.exports = timeframesRouter;
