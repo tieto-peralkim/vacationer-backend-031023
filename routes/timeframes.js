@@ -3,9 +3,9 @@
 const timeframesRouter = require("express").Router();
 const handleVacationData = require("../functions/handler");
 const fetcher = require("../functions/fetcher.js");
-const axios = require("axios")
+const axios = require("axios");
 
-let publicHolidays = []
+let publicHolidays = [];
 
 /**
  * @openapi
@@ -126,20 +126,17 @@ timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
     let year = req.params.year;
     let isSaved = false;
     let savedHolidays;
-    console.log(publicHolidays);
 
-    publicHolidays.forEach(y => {
+    publicHolidays.forEach((y) => {
         if (y.year === year) {
-            isSaved = true
-            savedHolidays = y
+            isSaved = true;
+            savedHolidays = y;
         }
     });
 
     if (!isSaved) {
         axios
-            .get(
-                `https://date.nager.at/api/v3/publicholidays/${year}/FI`
-            )
+            .get(`https://date.nager.at/api/v3/publicholidays/${year}/FI`)
             .then((response) => {
                 let publicDays = [];
 
@@ -154,7 +151,9 @@ timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
                     publicDays.push(publicDay);
                 }
 
-                publicHolidays.push({year: year, holidays: publicDays})
+                publicHolidays.push({ year: year, holidays: publicDays });
+                console.log("publicHolidays", publicHolidays);
+
                 res.status(200).send(publicDays);
             })
             .catch((error) => {
@@ -162,7 +161,6 @@ timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
                 next(error);
             });
     } else {
-         
         res.status(200).send(savedHolidays.holidays);
     }
 });
