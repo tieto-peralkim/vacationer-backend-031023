@@ -5,7 +5,7 @@ const handleVacationData = require("../functions/handler");
 const fetcher = require("../functions/fetcher.js");
 const axios = require("axios")
 
-const publicHolidays = []
+let publicHolidays = []
 
 /**
  * @openapi
@@ -97,38 +97,74 @@ timeframesRouter.get("/timespan", (req, res, next) => {
         .catch((error) => next(error));
 });
 
+/**
+ * @openapi
+ * /public-holidays/{year}:
+ *  get:
+ *      tags: ["timeframes"]
+ *      summary: Returns all Finnish public holidays on given year
+ *      description: Returns all Finnish public holidays on given year
+ *      parameters:
+ *      -   in: path
+ *          name: year
+ *          description: year to be fetched
+ *          schema:
+ *              type: string
+ *          required: true
+ *      responses:
+ *          200:
+ *              description: Returns Finnish public holidays on given year
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *          401:
+ *              description: Unauthenticated user
+ *          500:
+ *              description: Internal server error
+ */
 timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
     let year = req.params.year;
-    console.log(year);
+    let isSaved = false;
+    let savedHolidays;
+    console.log(publicHolidays);
 
-    axios
-        .get(
-            `https://date.nager.at/api/v3/publicholidays/${year}/FI`
-        )
-        .then((response) => {
-            let publicDays = [];
-            for (let i = 0; i < response.data.length; i++) {
-                let publicDay = {};
-                publicDay["month"] = parseInt(
-                    response.data[i].date.slice(5, 7)
-                );
-                publicDay["day"] = parseInt(
-                    response.data[i].date.slice(8, 10)
-                );
-                publicDays.push(publicDay);
-            }
+    publicHolidays.forEach(y => {
+        if (y.year === year) {
+            isSaved = true
+            savedHolidays = y
+        }
+    });
 
-            publicHolidays.push({year: year, holidays: publicDays})
+    if (!isSaved) {
+        axios
+            .get(
+                `https://date.nager.at/api/v3/publicholidays/${year}/FI`
+            )
+            .then((response) => {
+                let publicDays = [];
 
-            console.log("publicDays", publicHolidays);
-            res.status(200).send(publicDays);
+                for (let i = 0; i < response.data.length; i++) {
+                    let publicDay = {};
+                    publicDay["month"] = parseInt(
+                        response.data[i].date.slice(5, 7)
+                    );
+                    publicDay["day"] = parseInt(
+                        response.data[i].date.slice(8, 10)
+                    );
+                    publicDays.push(publicDay);
+                }
 
-        })
-        .catch((error) => {
-            res.status(200).send("publicDays");
-
-            console.error("There was a Public holiday API error!", error);
-        });
+                publicHolidays.push({year: year, holidays: publicDays})
+                res.status(200).send(publicDays);
+            })
+            .catch((error) => {
+                console.error("There was a Public holiday API error!", error);
+                next(error);
+            });
+    } else {
+         
+        res.status(200).send(savedHolidays.holidays);
+    }
 });
 
 module.exports = timeframesRouter;
