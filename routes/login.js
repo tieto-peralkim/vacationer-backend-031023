@@ -69,8 +69,8 @@ loginRouter.get("/login", (req, res) => {
  * /callback:
  *  get:
  *      tags: ["login"]
- *      summary: Callback endpoint for Github Authorization
- *      description: Callback endpoint for Github Authorization
+ *      summary: Callback endpoint for Github Authorization. Returns user cookies. If user not found from database, creates a new user
+ *      description: Callback endpoint for Github Authorization. Returns user cookies. If user not found from database, creates a new user
  *      responses:
  *          302:
  *              description: Redirection to front page or to loginFailed page
@@ -117,12 +117,13 @@ loginRouter.get("/callback", (req, res, next) => {
                                     );
 
                                     let newName = username;
+
                                     if (username.length < minNameLength) {
-                                        return res
-                                            .status(400)
-                                            .json(
-                                                `Username under ${minNameLength} characters`
-                                            );
+                                        let randomNumber = Math.floor(
+                                            100000 + Math.random() * 900000
+                                        );
+                                        newName =
+                                            "user" + randomNumber.toString();
                                     }
 
                                     if (username.length > maxNameLength) {

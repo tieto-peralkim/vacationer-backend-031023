@@ -149,8 +149,8 @@ vacationersRouter.get("/total", (req, res, next) => {
  * /vacationers/getById/{nameId}:
  *  get:
  *      tags: ["vacationer"]
- *      summary: Get single vacationer by name id. If not found, create a new user
- *      description: Get single vacationer by name id. If not found, create a new user
+ *      summary: Get single vacationer by Github id.
+ *      description: Get single vacationer by Github id.
  *      parameters:
  *      -   in: path
  *          name: nameId
@@ -165,14 +165,8 @@ vacationersRouter.get("/total", (req, res, next) => {
  *                  application/json:
  *                      schema:
  *                          $ref: "#/components/schemas/vacationer"
- *          201:
- *              description: User not found, created a new user successfully
- *          400:
- *              description: Username too short
  *          401:
  *              description: Unauthenticated user
- *          409:
- *              description: User not found, when trying to create a new user, user name already taken
  *          500:
  *              description: Internal server error
  */
