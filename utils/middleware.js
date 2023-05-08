@@ -80,7 +80,6 @@ function isAdmin() {
 
                         Vacationer.find({ nameId: decodedUser }).then(
                             (foundVacationer) => {
-                                console.log(foundVacationer);
                                 if (foundVacationer[0].admin !== true) {
                                     return res
                                         .status(403)

@@ -103,8 +103,8 @@ vacationersRouter.get("/allUsers", (req, res, next) => {
  */
 vacationersRouter.get("/deleted", (req, res, next) => {
     Vacationer.find({ deletedAt: { $ne: null } })
-        .then((vacationer) => {
-            res.status(200).json(vacationer);
+        .then((deletedVacationers) => {
+            res.status(200).json(deletedVacationers);
         })
         .catch((error) => next(error));
 });
@@ -139,8 +139,8 @@ vacationersRouter.get("/deleted", (req, res, next) => {
  */
 vacationersRouter.get("/total", (req, res, next) => {
     Vacationer.find({ deletedAt: { $exists: false } }, { name: 1 })
-        .then((vacationer) => {
-            res.status(200).json(vacationer);
+        .then((vacationers) => {
+            res.status(200).json(vacationers);
         })
         .catch((error) => next(error));
 });
@@ -149,8 +149,8 @@ vacationersRouter.get("/total", (req, res, next) => {
  * /vacationers/getById/{nameId}:
  *  get:
  *      tags: ["vacationer"]
- *      summary: Get single vacationer by name id. If not found, create a new user
- *      description: Get single vacationer by name id. If not found, create a new user
+ *      summary: Get single vacationer by Github id.
+ *      description: Get single vacationer by Github id.
  *      parameters:
  *      -   in: path
  *          name: nameId
@@ -165,14 +165,8 @@ vacationersRouter.get("/total", (req, res, next) => {
  *                  application/json:
  *                      schema:
  *                          $ref: "#/components/schemas/vacationer"
- *          201:
- *              description: User not found, created a new user successfully
- *          400:
- *              description: Username too short
  *          401:
  *              description: Unauthenticated user
- *          409:
- *              description: User not found, when trying to create a new user, user name already taken
  *          500:
  *              description: Internal server error
  */
@@ -181,39 +175,7 @@ vacationersRouter.get("/getById/:nameId", (req, res, next) => {
 
     Vacationer.find({ nameId: newNameId })
         .then((foundVacationer) => {
-            if (!foundVacationer.length) {
-                console.log("User does not exist, creating a user:", newNameId);
-
-                let newName = newNameId;
-                if (newNameId.length < minNameLength) {
-                    return res
-                        .status(400)
-                        .json(`Username under ${minNameLength} characters`);
-                }
-
-                if (newNameId.length > maxNameLength) {
-                    newName = newName.slice(0, maxNameLength);
-                }
-
-                let userInfo = { name: newName, nameId: newNameId };
-
-                console.log("userInfo", userInfo);
-                let newUser = new Vacationer(userInfo);
-                console.log("newUser", newUser);
-                newUser
-                    .save()
-                    .then((savedVacationer) => {
-                        console.log("savedVacationer", savedVacationer);
-                        return res.status(201).json(savedVacationer);
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                        console.error("Error code:", error.code);
-                        next(error);
-                    });
-            } else {
-                return res.status(200).json(foundVacationer);
-            }
+            res.status(200).json(foundVacationer);
         })
         .catch((error) => next(error));
 });

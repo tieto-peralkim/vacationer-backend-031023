@@ -4,12 +4,15 @@ const axios = require("axios");
 const loginRouter = require("express").Router();
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const Vacationer = require("../models/vacationer");
 
 const clientId = process.env.REACT_APP_GHUB_ID;
 const clientSecret = process.env.REACT_APP_GHUB_SECRET;
 const secret = process.env.REACT_APP_JWT_SECRET;
 const frontUrl = process.env.REACT_APP_FRONT_ADDRESS;
 
+const maxNameLength = 12;
+const minNameLength = 3;
 const ORGANISATION_NAME = "tieto-cem";
 const SELECTEDSCOPE = "read:org";
 const EXPIRATIONDAYS = 7;
@@ -66,8 +69,8 @@ loginRouter.get("/login", (req, res) => {
  * /callback:
  *  get:
  *      tags: ["login"]
- *      summary: Callback endpoint for Github Authorization
- *      description: Callback endpoint for Github Authorization
+ *      summary: Callback endpoint for Github Authorization. Returns user cookies. If user not found from database, creates a new user
+ *      description: Callback endpoint for Github Authorization. Returns user cookies. If user not found from database, creates a new user
  *      responses:
  *          302:
  *              description: Redirection to front page or to loginFailed page
@@ -94,7 +97,8 @@ loginRouter.get("/callback", (req, res, next) => {
                 axios.get("https://api.github.com/user/orgs", config),
             ])
                 .then((response) => {
-                    let username = { username: response[0].data.login };
+                    let usernameJSON = { username: response[0].data.login };
+                    let username = usernameJSON.username;
                     let organisations = response[1].data;
                     let rightOrganization = false;
 
@@ -104,8 +108,63 @@ loginRouter.get("/callback", (req, res, next) => {
                         }
                     }
                     if (rightOrganization) {
+                        Vacationer.find({ nameId: username }).then(
+                            (foundVacationer) => {
+                                if (!foundVacationer.length) {
+                                    console.log(
+                                        "User does not exist, creating a user:",
+                                        username
+                                    );
+
+                                    let newName = username;
+
+                                    if (username.length < minNameLength) {
+                                        let randomNumber = Math.floor(
+                                            100000 + Math.random() * 900000
+                                        );
+                                        newName =
+                                            "user" + randomNumber.toString();
+                                    }
+
+                                    if (username.length > maxNameLength) {
+                                        newName = newName.slice(
+                                            0,
+                                            maxNameLength
+                                        );
+                                    }
+
+                                    let userInfo = {
+                                        name: newName,
+                                        nameId: username,
+                                    };
+
+                                    let newUser = new Vacationer(userInfo);
+                                    console.log("newUser", newUser);
+
+                                    newUser
+                                        .save()
+                                        .then((savedVacationer) => {
+                                            console.log(
+                                                "savedVacationer",
+                                                savedVacationer
+                                            );
+                                        })
+                                        .catch((error) => {
+                                            console.error(error);
+                                            console.error(
+                                                "Error code:",
+                                                error.code
+                                            );
+                                            next(error);
+                                        });
+                                } else {
+                                    console.log("User found in database!");
+                                }
+                            }
+                        );
+
                         jwt.sign(
-                            username,
+                            usernameJSON,
                             secret,
                             { expiresIn: `${EXPIRATIONDAYS}d` },
                             (err, token) => {
