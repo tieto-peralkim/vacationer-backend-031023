@@ -112,6 +112,8 @@ teamsRouter.get("/deleted", (req, res, next) => {
  *                  application/json:
  *                      schema:
  *                          $ref: "#/components/schemas/team"
+ *          400:
+ *              description: Team name is not between 3 - 20 characters
  *          401:
  *              description: Unauthenticated user
  *          409:
@@ -125,13 +127,20 @@ teamsRouter.post("/", (req, res, next) => {
     const body = req.body;
     console.log("body", body);
     const TeamObject = new Team(body);
-    TeamObject.save()
-        .then((savedTeam) => {
-            res.status(201).json(savedTeam);
-        })
-        .catch((error) => {
-            next(error);
-        });
+
+    if (body.title.length >= 3 && body.title.length <= 20) {
+        TeamObject.save()
+            .then((savedTeam) => {
+                res.status(201).json(savedTeam);
+            })
+            .catch((error) => {
+                next(error);
+            });
+    } else {
+        res.status(400).send(
+            "BAD REQUEST - The team name must be between 3 - 20 characters"
+        );
+    }
 });
 
 /**
@@ -269,6 +278,8 @@ teamsRouter.post("/:id", (req, res, next) => {
  *                  application/json:
  *                      schema:
  *                          $ref: "#/components/schemas/team"
+ *          400:
+ *              description: Team name is not between 3 - 20 characters
  *          401:
  *              description: Unauthenticated user
  *          500:
@@ -280,15 +291,21 @@ teamsRouter.patch("/:id", (req, res, next) => {
 
     console.log("Changing team:", teamId, " ", "name to", newName);
 
-    Team.findByIdAndUpdate(
-        teamId,
-        { $set: { title: newName } },
-        { new: true, runValidators: true }
-    )
-        .then((updatedTeam) => {
-            res.status(200).json(updatedTeam);
-        })
-        .catch((error) => next(error));
+    if (newName.length >= 3 && newName.length <= 20) {
+        Team.findByIdAndUpdate(
+            teamId,
+            { $set: { title: newName } },
+            { new: true, runValidators: true }
+        )
+            .then((updatedTeam) => {
+                res.status(200).json(updatedTeam);
+            })
+            .catch((error) => next(error));
+    } else {
+        res.status(400).send(
+            "BAD REQUEST - The team name must be between 3 - 20 characters"
+        );
+    }
 });
 
 /**
