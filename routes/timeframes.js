@@ -44,7 +44,6 @@ let publicHolidays = [];
 timeframesRouter.get("/holidaysbetween", (req, res, next) => {
     let start = req.query.start;
     let end = req.query.end;
-    console.log("holidaysbetween:", start, "-", end);
 
     fetcher
         .fetchVacationsBetween(start, end)
@@ -136,6 +135,7 @@ timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
 
     if (!isSaved) {
         axios
+            // Fetching Finnish public holidays from Public holiday API
             .get(`https://date.nager.at/api/v3/publicholidays/${year}/FI`)
             .then((response) => {
                 let publicDays = [];

@@ -3,6 +3,8 @@
 const teamsRouter = require("express").Router();
 const Team = require("../models/team");
 const { isAdmin } = require("../utils/middleware");
+const minNameLength = 3;
+const maxNameLength = 20;
 
 /**
  * @openapi
@@ -112,6 +114,8 @@ teamsRouter.get("/deleted", (req, res, next) => {
  *                  application/json:
  *                      schema:
  *                          $ref: "#/components/schemas/team"
+ *          400:
+ *              description: Team name wrong length
  *          401:
  *              description: Unauthenticated user
  *          409:
@@ -125,13 +129,23 @@ teamsRouter.post("/", (req, res, next) => {
     const body = req.body;
     console.log("body", body);
     const TeamObject = new Team(body);
-    TeamObject.save()
-        .then((savedTeam) => {
-            res.status(201).json(savedTeam);
-        })
-        .catch((error) => {
-            next(error);
-        });
+
+    if (
+        body.title.length >= minNameLength &&
+        body.title.length <= maxNameLength
+    ) {
+        TeamObject.save()
+            .then((savedTeam) => {
+                res.status(201).json(savedTeam);
+            })
+            .catch((error) => {
+                next(error);
+            });
+    } else {
+        res.status(400).send(
+            `BAD REQUEST - The team name must be between ${minNameLength}-${maxNameLength} characters`
+        );
+    }
 });
 
 /**
@@ -269,6 +283,8 @@ teamsRouter.post("/:id", (req, res, next) => {
  *                  application/json:
  *                      schema:
  *                          $ref: "#/components/schemas/team"
+ *          400:
+ *              description: Team name wrong length
  *          401:
  *              description: Unauthenticated user
  *          500:
@@ -280,15 +296,21 @@ teamsRouter.patch("/:id", (req, res, next) => {
 
     console.log("Changing team:", teamId, " ", "name to", newName);
 
-    Team.findByIdAndUpdate(
-        teamId,
-        { $set: { title: newName } },
-        { new: true, runValidators: true }
-    )
-        .then((updatedTeam) => {
-            res.status(200).json(updatedTeam);
-        })
-        .catch((error) => next(error));
+    if (newName.length >= minNameLength && newName.length <= maxNameLength) {
+        Team.findByIdAndUpdate(
+            teamId,
+            { $set: { title: newName } },
+            { new: true, runValidators: true }
+        )
+            .then((updatedTeam) => {
+                res.status(200).json(updatedTeam);
+            })
+            .catch((error) => next(error));
+    } else {
+        res.status(400).send(
+            `BAD REQUEST - The team name must be between ${minNameLength}-${maxNameLength} characters`
+        );
+    }
 });
 
 /**
