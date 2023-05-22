@@ -3,6 +3,8 @@
 const teamsRouter = require("express").Router();
 const Team = require("../models/team");
 const { isAdmin } = require("../utils/middleware");
+const minNameLength = 3;
+const maxNameLength = 20;
 
 /**
  * @openapi
@@ -113,7 +115,7 @@ teamsRouter.get("/deleted", (req, res, next) => {
  *                      schema:
  *                          $ref: "#/components/schemas/team"
  *          400:
- *              description: Team name is not between 3 - 20 characters
+ *              description: Team name wrong length
  *          401:
  *              description: Unauthenticated user
  *          409:
@@ -128,7 +130,10 @@ teamsRouter.post("/", (req, res, next) => {
     console.log("body", body);
     const TeamObject = new Team(body);
 
-    if (body.title.length >= 3 && body.title.length <= 20) {
+    if (
+        body.title.length >= minNameLength &&
+        body.title.length <= maxNameLength
+    ) {
         TeamObject.save()
             .then((savedTeam) => {
                 res.status(201).json(savedTeam);
@@ -138,7 +143,7 @@ teamsRouter.post("/", (req, res, next) => {
             });
     } else {
         res.status(400).send(
-            "BAD REQUEST - The team name must be between 3 - 20 characters"
+            `BAD REQUEST - The team name must be between ${minNameLength}-${maxNameLength} characters`
         );
     }
 });
@@ -279,7 +284,7 @@ teamsRouter.post("/:id", (req, res, next) => {
  *                      schema:
  *                          $ref: "#/components/schemas/team"
  *          400:
- *              description: Team name is not between 3 - 20 characters
+ *              description: Team name wrong length
  *          401:
  *              description: Unauthenticated user
  *          500:
@@ -291,7 +296,7 @@ teamsRouter.patch("/:id", (req, res, next) => {
 
     console.log("Changing team:", teamId, " ", "name to", newName);
 
-    if (newName.length >= 3 && newName.length <= 20) {
+    if (newName.length >= minNameLength && newName.length <= maxNameLength) {
         Team.findByIdAndUpdate(
             teamId,
             { $set: { title: newName } },
@@ -303,7 +308,7 @@ teamsRouter.patch("/:id", (req, res, next) => {
             .catch((error) => next(error));
     } else {
         res.status(400).send(
-            "BAD REQUEST - The team name must be between 3 - 20 characters"
+            `BAD REQUEST - The team name must be between ${minNameLength}-${maxNameLength} characters`
         );
     }
 });
