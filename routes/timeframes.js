@@ -6,6 +6,8 @@ const fetcher = require("../functions/fetcher.js");
 const axios = require("axios");
 
 let publicHolidaysByYear = new Map();
+// TODO: poista! ja kehitä tapa jakaa muulla tavoin muuttuja
+global.publicHolidaysByYear = publicHolidaysByYear;
 
 /**
  * @openapi
@@ -165,4 +167,3 @@ timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
 });
 
 module.exports = timeframesRouter;
-exports.publicHolidaysByYear = publicHolidaysByYear;

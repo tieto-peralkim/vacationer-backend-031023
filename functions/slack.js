@@ -3,7 +3,6 @@
 const fetcher = require("./fetcher.js");
 const handleVacationData = require("./handler");
 const axios = require("axios");
-let publicHolidaysByYear = require("../routes/timeframes").publicHolidaysByYear;
 
 const getNextWeekDates = () => {
     let thisMonday = new Date();
@@ -23,7 +22,6 @@ const getNextWeekDates = () => {
 
 const dayString = (day) => {
     let dayAsDate = new Date(day[0]);
-    console.log("joo", publicHolidaysByYear);
     // Get public holidays of the date
     let foundPublicHoliday = publicHolidaysByYear
         .get(dayAsDate.getFullYear().toString())
@@ -32,7 +30,6 @@ const dayString = (day) => {
                 holiday.month === dayAsDate.getMonth() + 1 &&
                 holiday.day === dayAsDate.getDate()
         );
-    console.log("dayAsDate", dayAsDate.getDate(), foundPublicHoliday);
 
     if (foundPublicHoliday.length > 0) {
         return `*${foundPublicHoliday[0].nameFinnish}*`;
