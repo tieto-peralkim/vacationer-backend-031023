@@ -5,7 +5,7 @@ const handleVacationData = require("../functions/handler");
 const fetcher = require("../functions/fetcher.js");
 const axios = require("axios");
 
-let publicHolidays = [];
+let publicHolidaysByYear = new Map();
 
 /**
  * @openapi
@@ -125,13 +125,12 @@ timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
     let year = req.params.year;
     let isSaved = false;
     let savedHolidays;
+    console.log("publicHolidaysByYear", publicHolidaysByYear);
 
-    publicHolidays.forEach((y) => {
-        if (y.year === year) {
-            isSaved = true;
-            savedHolidays = y;
-        }
-    });
+    if (publicHolidaysByYear.get(year)) {
+        isSaved = true;
+        savedHolidays = publicHolidaysByYear.get(year);
+    }
 
     if (!isSaved) {
         axios
@@ -142,17 +141,17 @@ timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
 
                 for (let i = 0; i < response.data.length; i++) {
                     let publicDay = {};
-                    publicDay["month"] = parseInt(
-                        response.data[i].date.slice(5, 7)
-                    );
-                    publicDay["day"] = parseInt(
-                        response.data[i].date.slice(8, 10)
-                    );
+                    publicDay["month"] =
+                        new Date(response.data[i].date).getMonth() + 1;
+                    publicDay["day"] = new Date(
+                        response.data[i].date
+                    ).getDate();
+                    publicDay["nameFinnish"] = response.data[i].localName;
                     publicDays.push(publicDay);
                 }
 
-                publicHolidays.push({ year: year, holidays: publicDays });
-                console.log("publicHolidays", publicHolidays);
+                publicHolidaysByYear.set(year, publicDays);
+                console.log("publicHolidaysByYear", publicHolidaysByYear);
 
                 res.status(200).send(publicDays);
             })
@@ -161,8 +160,9 @@ timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
                 next(error);
             });
     } else {
-        res.status(200).send(savedHolidays.holidays);
+        res.status(200).send(savedHolidays);
     }
 });
 
 module.exports = timeframesRouter;
+exports.publicHolidaysByYear = publicHolidaysByYear;
