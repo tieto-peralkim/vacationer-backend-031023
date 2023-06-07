@@ -31,16 +31,6 @@ async function handleVacationData(start, end) {
         let count = 0;
         let vacationersOfDay = [];
         holidayTimes.forEach(function (range) {
-            // console.log(
-            //     "is ",
-            //     earlyDate,
-            //     " between ",
-            //     range.start,
-            //     " - ",
-            //     range.end,
-            //     "? ",
-            //     earlyDate >= range.start && earlyDate <= range.end
-            // );
             if (earlyDate >= range.start && earlyDate <= range.end) {
                 count++;
                 vacationersOfDay.push(range.vacationers);

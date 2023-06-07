@@ -48,10 +48,8 @@ function messageText(vacationers, days) {
 const slackMessageRequest = (vacationerAmount, weekList) => {
     let finalMessage = "";
     if (!vacationerAmount && !weekList) {
-        console.log("Ei lomalaisia seuraavaan kahteen viikkoon");
-        finalMessage = "💻 *Ei lomalaisia seuraavana kahtena viikkona.*";
+        finalMessage = "🌴 *Ei lomalaisia seuraavana kahtena viikkona.*";
     } else {
-        console.log("messageText", messageText(vacationerAmount, weekList));
         finalMessage = messageText(vacationerAmount, weekList);
     }
 
