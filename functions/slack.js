@@ -6,10 +6,8 @@ const axios = require("axios");
 
 const getNextWeekDates = () => {
     let thisMonday = new Date();
-    // thisMonday.setUTCDate(
-    thisMonday.setTime(
-        // thisMonday.getUTCDate() - ((thisMonday.getUTCDay() + 6) % 7)
-        thisMonday.getTime() + 6 * 24 * 60 * 60 * 1000
+    thisMonday.setUTCDate(
+        thisMonday.getUTCDate() - ((thisMonday.getUTCDay() + 6) % 7)
     );
     thisMonday.setUTCHours(12, 0, 0, 0);
 
@@ -22,17 +20,8 @@ const getNextWeekDates = () => {
 
 const dayString = (day) => {
     let dayAsDate = new Date(day[0]);
-    // Get public holidays of the date
-    let foundPublicHoliday = publicHolidaysByYear
-        .get(dayAsDate.getFullYear().toString())
-        .filter(
-            (holiday) =>
-                holiday.month === dayAsDate.getMonth() + 1 &&
-                holiday.day === dayAsDate.getDate()
-        );
-
-    if (foundPublicHoliday.length > 0) {
-        return `*${foundPublicHoliday[0].nameFinnish}*`;
+    if (day[1] === 0) {
+        return `${dayAsDate.toLocaleDateString("fi-FI")}  ${day[1]}`;
     } else {
         // Normal holiday date structure: {date, amount of people on holiday, list of people on holiday}
         return `${dayAsDate.toLocaleDateString("fi-FI")}  ${day[1]} - ${
@@ -58,28 +47,27 @@ function messageText(vacationers, days) {
 
 const slackMessageRequest = (vacationerAmount, weekList) => {
     let finalMessage = "";
-
     if (!vacationerAmount && !weekList) {
         console.log("Ei lomalaisia seuraavaan kahteen viikkoon");
-        finalMessage = "🌴 *Ei lomalaisia seuraavaan kahteen viikkoon.*";
+        finalMessage = "💻 *Ei lomalaisia seuraavana kahtena viikkona.*";
     } else {
         console.log("messageText", messageText(vacationerAmount, weekList));
         finalMessage = messageText(vacationerAmount, weekList);
     }
 
-    // axios
-    //     .post(
-    //         process.env.REACT_APP_SLACK_URI,
-    //         JSON.stringify({
-    //             text: finalMessage,
-    //         })
-    //     )
-    //     .then((response) => {
-    //         console.log("Slack message sent:", response.data);
-    //     })
-    //     .catch((error) => {
-    //         console.error("There was a Slack post error!", error);
-    //     });
+    axios
+        .post(
+            process.env.REACT_APP_SLACK_URI,
+            JSON.stringify({
+                text: finalMessage,
+            })
+        )
+        .then((response) => {
+            console.log("Slack message sent:", response.data);
+        })
+        .catch((error) => {
+            console.error("There was a Slack post error!", error);
+        });
 };
 
 const sendSlackMessage = () => {

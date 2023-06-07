@@ -6,8 +6,6 @@ const fetcher = require("../functions/fetcher.js");
 const axios = require("axios");
 
 let publicHolidaysByYear = new Map();
-// TODO: poista! ja kehitä tapa jakaa muulla tavoin muuttuja
-global.publicHolidaysByYear = publicHolidaysByYear;
 
 /**
  * @openapi
@@ -103,8 +101,8 @@ timeframesRouter.get("/timespan", (req, res, next) => {
  * /public-holidays/{year}:
  *  get:
  *      tags: ["timeframes"]
- *      summary: Returns all Finnish public holidays on given year
- *      description: Returns all Finnish public holidays on given year
+ *      summary: Returns all Finnish public holidays on given year. Saves data to backend cache variable
+ *      description: Returns all Finnish public holidays on given year. Saves data to backend cache variable
  *      parameters:
  *      -   in: path
  *          name: year
@@ -125,16 +123,12 @@ timeframesRouter.get("/timespan", (req, res, next) => {
  */
 timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
     let year = req.params.year;
-    let isSaved = false;
     let savedHolidays;
-    console.log("publicHolidaysByYear", publicHolidaysByYear);
 
     if (publicHolidaysByYear.get(year)) {
-        isSaved = true;
         savedHolidays = publicHolidaysByYear.get(year);
-    }
-
-    if (!isSaved) {
+        res.status(200).send(savedHolidays);
+    } else {
         axios
             // Fetching Finnish public holidays from Public holiday API
             .get(`https://date.nager.at/api/v3/publicholidays/${year}/FI`)
@@ -153,16 +147,12 @@ timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
                 }
 
                 publicHolidaysByYear.set(year, publicDays);
-                console.log("publicHolidaysByYear", publicHolidaysByYear);
-
                 res.status(200).send(publicDays);
             })
             .catch((error) => {
                 console.error("There was a Public holiday API error!", error);
                 next(error);
             });
-    } else {
-        res.status(200).send(savedHolidays);
     }
 });
 
