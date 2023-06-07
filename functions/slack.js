@@ -37,12 +37,11 @@ function messageText(vacationers, days) {
         days[0]
     )}\n>ti ${dayString(days[1])}\n>ke ${dayString(days[2])}\n>to ${dayString(
         days[3]
-    )}\n>pe ${dayString(days[4])} \n*Ensi viikolla:*
-                \n>ma ${dayString(days[7])}\n>ti ${dayString(
-        days[8]
-    )} \n>ke ${dayString(days[9])}\n>to ${dayString(days[10])}\n>pe ${dayString(
-        days[11]
-    )}`;
+    )}\n>pe ${dayString(days[4])} \n*Ensi viikolla:*\n>ma ${dayString(
+        days[7]
+    )}\n>ti ${dayString(days[8])} \n>ke ${dayString(days[9])}\n>to ${dayString(
+        days[10]
+    )}\n>pe ${dayString(days[11])}`;
 }
 
 const slackMessageRequest = (vacationerAmount, weekList) => {
