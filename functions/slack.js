@@ -10,7 +10,6 @@ const getNextWeekDates = () => {
         thisMonday.getUTCDate() - ((thisMonday.getUTCDay() + 6) % 7)
     );
     thisMonday.setUTCHours(12, 0, 0, 0);
-    console.log("thisMonday", thisMonday);
 
     let nextWeekFriday = new Date();
     nextWeekFriday.setTime(thisMonday.getTime() + 11 * 24 * 60 * 60 * 1000);
@@ -19,48 +18,45 @@ const getNextWeekDates = () => {
     return { thisMonday, nextWeekFriday };
 };
 
+const dayString = (day) => {
+    let dayAsDate = new Date(day[0]);
+    if (day[1] === 0) {
+        return `${dayAsDate.toLocaleDateString("fi-FI")}  ${day[1]}`;
+    } else {
+        // Normal holiday date structure: {date, amount of people on holiday, list of people on holiday}
+        return `${dayAsDate.toLocaleDateString("fi-FI")}  ${day[1]} - ${
+            day[2]
+        }`;
+    }
+};
+
+// Create daily message for two work weeks (Monday[ma] to Friday[pe])
 function messageText(vacationers, days) {
-    return `🌴 *Tulevina viikkoina ${vacationers} lomalaista.*\n\n*Tällä viikolla:*
-                \n>ma ${new Date(days[0][0]).toLocaleDateString("fi-FI")}  ${
-        days[0][1]
-    } - ${days[0][2]}\n>ti ${new Date(days[1][0]).toLocaleDateString(
-        "fi-FI"
-    )}  ${days[1][1]} - ${days[1][2]}\n>ke ${new Date(
-        days[2][0]
-    ).toLocaleDateString("fi-FI")}  ${days[2][1]} - ${
-        days[2][2]
-    }\n>to ${new Date(days[3][0]).toLocaleDateString("fi-FI")}  ${
-        days[3][1]
-    } - ${days[3][2]}\n>pe ${new Date(days[4][0]).toLocaleDateString(
-        "fi-FI"
-    )}  ${days[4][1]} - ${days[4][2]}
-                \n*Ensi viikolla:*
-                \n>ma ${new Date(days[7][0]).toLocaleDateString("fi-FI")}  ${
-        days[7][1]
-    } - ${days[7][2]}\n>ti ${new Date(days[8][0]).toLocaleDateString(
-        "fi-FI"
-    )}  ${days[8][1]} - ${days[8][2]}\n>ke ${new Date(
-        days[9][0]
-    ).toLocaleDateString("fi-FI")}  ${days[9][1]} - ${
-        days[9][2]
-    }\n>to ${new Date(days[10][0]).toLocaleDateString("fi-FI")}  ${
-        days[10][1]
-    } - ${days[10][2]}\n>pe ${new Date(days[11][0]).toLocaleDateString(
-        "fi-FI"
-    )}  ${days[11][1]} - ${days[11][2]}`;
+    console.log("days", days);
+    return `🌴 *Tulevina viikkoina ${vacationers} lomalaista.*\n\n*Tällä viikolla:*\n>ma ${dayString(
+        days[0]
+    )}\n>ti ${dayString(days[1])}\n>ke ${dayString(days[2])}\n>to ${dayString(
+        days[3]
+    )}\n>pe ${dayString(days[4])} \n*Ensi viikolla:*\n>ma ${dayString(
+        days[7]
+    )}\n>ti ${dayString(days[8])} \n>ke ${dayString(days[9])}\n>to ${dayString(
+        days[10]
+    )}\n>pe ${dayString(days[11])}`;
 }
 
-const slackMessage = (vacationerAmount, weekList) => {
-    for (let i = 0; i < weekList.length; i++) {
-        if (weekList[i][1] === 0) {
-            weekList[i][1] = "";
-        }
+const slackMessageRequest = (vacationerAmount, weekList) => {
+    let finalMessage = "";
+    if (!vacationerAmount && !weekList) {
+        finalMessage = "🌴 *Ei lomalaisia seuraavana kahtena viikkona.*";
+    } else {
+        finalMessage = messageText(vacationerAmount, weekList);
     }
+
     axios
         .post(
             process.env.REACT_APP_SLACK_URI,
             JSON.stringify({
-                text: messageText(vacationerAmount, weekList),
+                text: finalMessage,
             })
         )
         .then((response) => {
@@ -86,14 +82,22 @@ const sendSlackMessage = () => {
         .fetchVacationerAmount(thisMonday, nextWeekFriday)
         .then((response) => {
             numberOfVacationers = response.length;
-            handleVacationData(thisMonday, nextWeekFriday)
-                .then((response) => {
-                    vacationersPerDay = response;
-                    slackMessage(numberOfVacationers, vacationersPerDay);
-                })
-                .catch((error) => {
-                    console.error("handleVacationData error: ", error);
-                });
+
+            if (numberOfVacationers !== 0) {
+                handleVacationData(thisMonday, nextWeekFriday)
+                    .then((response) => {
+                        vacationersPerDay = response;
+                        slackMessageRequest(
+                            numberOfVacationers,
+                            vacationersPerDay
+                        );
+                    })
+                    .catch((error) => {
+                        console.error("handleVacationData error: ", error);
+                    });
+            } else {
+                slackMessageRequest();
+            }
         })
         .catch((error) => {
             console.error("fetchVacationerAmount error: ", error);

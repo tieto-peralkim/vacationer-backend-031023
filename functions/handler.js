@@ -9,8 +9,6 @@ async function handleVacationData(start, end) {
         start,
         end
     );
-    console.log("holidaysBetweenDates", holidaysBetweenDates);
-
     let holidayTimes = [];
 
     for (let i = 0; i < holidaysBetweenDates.length; i++) {
@@ -24,29 +22,15 @@ async function handleVacationData(start, end) {
         vacationObject["vacationers"] = holidaysBetweenDates[i].name;
         holidayTimes.push(vacationObject);
     }
-    console.log("holidayTimes", holidayTimes);
 
     let earlyDate = new Date(start);
     let lateDate = new Date(end);
-
-    console.log("start:", earlyDate);
-    console.log("end:", lateDate);
 
     let arrayOfDates = [];
     while (earlyDate <= lateDate) {
         let count = 0;
         let vacationersOfDay = [];
         holidayTimes.forEach(function (range) {
-            // console.log(
-            //     "is ",
-            //     earlyDate,
-            //     " between ",
-            //     range.start,
-            //     " - ",
-            //     range.end,
-            //     "? ",
-            //     earlyDate >= range.start && earlyDate <= range.end
-            // );
             if (earlyDate >= range.start && earlyDate <= range.end) {
                 count++;
                 vacationersOfDay.push(range.vacationers);
@@ -56,7 +40,6 @@ async function handleVacationData(start, end) {
         dateObject[0] = new Date(JSON.parse(JSON.stringify(earlyDate)));
         dateObject[1] = count;
         dateObject[2] = vacationersOfDay.join(", ");
-        console.log("dateObject", dateObject);
         arrayOfDates.push(dateObject);
         earlyDate.setDate(earlyDate.getDate() + 1);
     }

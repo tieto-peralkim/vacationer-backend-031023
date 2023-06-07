@@ -5,7 +5,7 @@ const handleVacationData = require("../functions/handler");
 const fetcher = require("../functions/fetcher.js");
 const axios = require("axios");
 
-let publicHolidays = [];
+let publicHolidaysByYear = new Map();
 
 /**
  * @openapi
@@ -101,8 +101,8 @@ timeframesRouter.get("/timespan", (req, res, next) => {
  * /public-holidays/{year}:
  *  get:
  *      tags: ["timeframes"]
- *      summary: Returns all Finnish public holidays on given year
- *      description: Returns all Finnish public holidays on given year
+ *      summary: Returns all Finnish public holidays on given year. Saves data to backend cache variable
+ *      description: Returns all Finnish public holidays on given year. Saves data to backend cache variable
  *      parameters:
  *      -   in: path
  *          name: year
@@ -123,17 +123,12 @@ timeframesRouter.get("/timespan", (req, res, next) => {
  */
 timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
     let year = req.params.year;
-    let isSaved = false;
     let savedHolidays;
 
-    publicHolidays.forEach((y) => {
-        if (y.year === year) {
-            isSaved = true;
-            savedHolidays = y;
-        }
-    });
-
-    if (!isSaved) {
+    if (publicHolidaysByYear.get(year)) {
+        savedHolidays = publicHolidaysByYear.get(year);
+        res.status(200).send(savedHolidays);
+    } else {
         axios
             // Fetching Finnish public holidays from Public holiday API
             .get(`https://date.nager.at/api/v3/publicholidays/${year}/FI`)
@@ -142,26 +137,22 @@ timeframesRouter.get("/public-holidays/:year", (req, res, next) => {
 
                 for (let i = 0; i < response.data.length; i++) {
                     let publicDay = {};
-                    publicDay["month"] = parseInt(
-                        response.data[i].date.slice(5, 7)
-                    );
-                    publicDay["day"] = parseInt(
-                        response.data[i].date.slice(8, 10)
-                    );
+                    publicDay["month"] =
+                        new Date(response.data[i].date).getMonth() + 1;
+                    publicDay["day"] = new Date(
+                        response.data[i].date
+                    ).getDate();
+                    publicDay["nameFinnish"] = response.data[i].localName;
                     publicDays.push(publicDay);
                 }
 
-                publicHolidays.push({ year: year, holidays: publicDays });
-                console.log("publicHolidays", publicHolidays);
-
+                publicHolidaysByYear.set(year, publicDays);
                 res.status(200).send(publicDays);
             })
             .catch((error) => {
                 console.error("There was a Public holiday API error!", error);
                 next(error);
             });
-    } else {
-        res.status(200).send(savedHolidays.holidays);
     }
 });
 
