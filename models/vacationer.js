@@ -34,6 +34,8 @@ const vacationerSchema = new mongoose.Schema(
                     weekendHolidayColor: "#CCCCCC",
                     holidaySymbol: "X",
                     unConfirmedHolidaySymbol: "Y",
+                    symbolFontColor: "#000000",
+                    rowHeight: 1,
                 },
             ],
             description: "Calendar colors and symbols",
