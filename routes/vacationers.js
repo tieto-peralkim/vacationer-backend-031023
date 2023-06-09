@@ -386,6 +386,14 @@ vacationersRouter.patch("/:vacationerId", (req, res, next) => {
  *                                          type: string
  *                                          default: "Y"
  *                                          description: Unconfirmed holiday symbol
+ *                                      symbolFontColor:
+ *                                          type: string
+ *                                          default: "#000000"
+ *                                          description: Holiday symbol color
+ *                                      rowHeight:
+ *                                          type: integer
+ *                                          default: 1
+ *                                          description: Calendar row height in em
  *      parameters:
  *      -   in: path
  *          name: vacationerId
@@ -514,6 +522,14 @@ vacationersRouter.patch(
  *                               type: string
  *                               default: "Y"
  *                               description: Unconfirmed holiday symbol
+ *                          symbolFontColor:
+ *                               type: string
+ *                               default: "#000000"
+ *                               description: Holiday symbol color
+ *                          rowHeight:
+ *                              type: integer
+ *                              default: 1
+ *                              description: Calendar row height in em
  *      parameters:
  *      -   in: path
  *          name: vacationerId
