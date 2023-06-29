@@ -67,7 +67,7 @@ if (
         );
         remover
             .removeDeletableData()
-            .then((response) => {
+            .then(() => {
                 console.log("Done removing data");
             })
             .catch((error) => {

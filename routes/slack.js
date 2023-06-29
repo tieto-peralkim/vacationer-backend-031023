@@ -23,7 +23,7 @@ const { isAdmin } = require("../utils/middleware");
  *          500:
  *              description: Internal server error
  */
-slackRouter.get("/slackMessageSender", [isAdmin()], (req, res, next) => {
+slackRouter.get("/slackMessageSender", [isAdmin()], (req, res) => {
     sendSlackMessage();
     res.status(200).send("Slack query sent");
 });
