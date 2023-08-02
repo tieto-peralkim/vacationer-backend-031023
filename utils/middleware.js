@@ -31,7 +31,9 @@ const checkAuthentication = (req, res, next) => {
             req.cookies["payload"].payload +
             "." +
             req.cookies["header-signature"].signature;
+        /* eslint-disable */
         let decodedUser;
+        /* eslint-enable */
 
         try {
             jwt.verify(
