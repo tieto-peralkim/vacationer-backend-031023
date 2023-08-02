@@ -71,7 +71,7 @@ jobs:
         FRONT_ADDRESS: ${{ secrets.FRONT_ADDRESS }}
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-        ssh -o StrictHostKeyChecking=no -i private_key ubuntu@34.240.254.109 'bash -s --' < docker_backend.sh $DOCDB_CREDENTIALS $SLACK_URI $GHUB_ID_QA $GHUB_SECRET_QA $JWT_SECRET $FRONT_ADDRESS
+        ssh -o StrictHostKeyChecking=no -i private_key ubuntu@34.243.226.246 'bash -s --' < docker_backend.sh $DOCDB_CREDENTIALS $SLACK_URI $GHUB_ID_QA $GHUB_SECRET_QA $JWT_SECRET $FRONT_ADDRESS
 
     - name: Remove Github Actions IP from Security group
       run: |
