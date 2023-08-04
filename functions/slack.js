@@ -6,11 +6,11 @@ const axios = require("axios");
 let allPublicHolidays = [];
 
 const getNextWeekDates = () => {
-    let thisMonday = new Date(2023, 11, 3, 12);
-    // thisMonday.setUTCDate(
-    //     thisMonday.getUTCDate() - ((thisMonday.getUTCDay() + 6) % 7)
-    // );
-    // thisMonday.setUTCHours(12, 0, 0, 0);
+    let thisMonday = new Date();
+    thisMonday.setUTCDate(
+        thisMonday.getUTCDate() - ((thisMonday.getUTCDay() + 6) % 7)
+    );
+    thisMonday.setUTCHours(12, 0, 0, 0);
 
     let nextWeekFriday = new Date();
     nextWeekFriday.setTime(thisMonday.getTime() + 11 * 24 * 60 * 60 * 1000);
@@ -45,7 +45,7 @@ async function getPublicHolidayData(year) {
 
     const response = await axios
         // Fetching Finnish public holidays from Public holiday API
-        .get(`https://date.nager.at/api/v3/publicholidays/${year}/FIa`)
+        .get(`https://date.nager.at/api/v3/publicholidays/${year}/FI`)
         .catch(() => {
             console.error("There was a Public holiday API error!");
             return publicHolidays;
@@ -87,21 +87,19 @@ function sendFinalMessage(vacationers, days) {
         }
     }
 
-    console.log("fm", fullMessage);
-
-    // axios
-    //     .post(
-    //         process.env.REACT_APP_SLACK_URI,
-    //         JSON.stringify({
-    //             text: fullMessage,
-    //         })
-    //     )
-    //     .then((response) => {
-    //         console.log("Slack message sent:", response.data);
-    //     })
-    //     .catch((error) => {
-    //         console.error("There was a Slack post error!", error);
-    //     });
+    axios
+        .post(
+            process.env.REACT_APP_SLACK_URI,
+            JSON.stringify({
+                text: fullMessage,
+            })
+        )
+        .then((response) => {
+            console.log("Slack message sent:", response.data);
+        })
+        .catch((error) => {
+            console.error("There was a Slack post error!", error);
+        });
 }
 
 function slackMessageRequest(vacationerAmount, weekList) {
@@ -149,9 +147,6 @@ const sendSlackMessage = () => {
     let nextWeekDates = getNextWeekDates();
     let thisMonday = nextWeekDates.thisMonday;
     let nextWeekFriday = nextWeekDates.nextWeekFriday;
-
-    console.log("thisMonday ", thisMonday);
-    console.log("nextWeekFriday ", nextWeekFriday);
 
     fetcher
         .fetchVacationerAmount(thisMonday, nextWeekFriday)
