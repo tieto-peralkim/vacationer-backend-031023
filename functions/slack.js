@@ -28,7 +28,9 @@ const dayString = (day) => {
             (o) => o.date === shortDateFormat
         );
         if (foundPublicHoliday) {
-            return `${foundPublicHoliday.localName}`;
+            return `${day[0].toLocaleDateString("fi-FI")}  *${
+                foundPublicHoliday.localName
+            }*`;
         }
     }
 
