@@ -19,41 +19,47 @@ const getNextWeekDates = () => {
     return { thisMonday, nextWeekFriday };
 };
 
-const dayString = (day) => {
-    let shortDateFormat = day[0].toISOString().substring(0, 10);
+const publicHolidayString = (selectedDate) => {
+    let shortDateFormat = selectedDate.toISOString().substring(0, 10);
+    let foundPublicHoliday;
 
-    // If nager.date API returned a value, check if date is public holiday
     if (allPublicHolidays) {
-        let foundPublicHoliday = allPublicHolidays.find(
+        foundPublicHoliday = allPublicHolidays.find(
             (o) => o.date === shortDateFormat
         );
         if (foundPublicHoliday) {
-            return `${day[0].toLocaleDateString("fi-FI")}  *${
+            return `${selectedDate.toLocaleDateString("fi-FI")}  *${
                 foundPublicHoliday.localName
-            }*`;
+            }*\n`;
         }
     }
+};
 
+const dayString = (day) => {
+    // Check if date is public holiday
+    if (publicHolidayString(day[0])) {
+        return publicHolidayString(day[0]);
+    }
+    // No people on holiday
     if (day[1] === 0) {
-        return `${day[0].toLocaleDateString("fi-FI")}  0`;
+        return `${day[0].toLocaleDateString("fi-FI")}  0\n`;
     } else {
-        // Normal holiday date structure: {date, amount of people on holiday, list of people on holiday}
-        return `${day[0].toLocaleDateString("fi-FI")}  ${day[1]} - ${day[2]}`;
+        // Holiday date: {date, amount of people on holiday, list of people on holiday}
+        return `${day[0].toLocaleDateString("fi-FI")}  ${day[1]} - ${day[2]}\n`;
     }
 };
 
 async function getPublicHolidayData(year) {
     let publicHolidays = [];
-
     const response = await axios
         // Fetching Finnish public holidays from Public holiday API
         .get(`https://date.nager.at/api/v3/publicholidays/${year}/FI`)
-        .catch(() => {
+        .catch((error) => {
             console.error("There was a Public holiday API error!");
-            return publicHolidays;
+            console.error(error.response);
         });
 
-    if (response.data) {
+    if (response) {
         for (let i = 0; i < response.data.length; i++) {
             let publicDay = {};
             publicDay["date"] = response.data[i].date;
@@ -67,26 +73,44 @@ async function getPublicHolidayData(year) {
 // Create daily message for two work weeks (Monday[ma] to Friday[pe])
 function sendFinalMessage(vacationers, days) {
     let fullMessage = "";
+    if (
+        process.env.REACT_APP_ENVIRONMENT === "local" ||
+        process.env.REACT_APP_ENVIRONMENT === "qa"
+    ) {
+        fullMessage = `_Manuaalitesti ${process.env.REACT_APP_ENVIRONMENT}_\n\n`;
+    }
 
     if (!vacationers && !days) {
-        fullMessage = "🌴 *Ei lomalaisia seuraavana kahtena viikkona.*";
-    } else {
-        fullMessage = `🌴 *Tulevina viikkoina ${vacationers} lomalaista.*\n\n*Tällä viikolla:*\n>ma ${dayString(
-            days[0]
-        )}\n>ti ${dayString(days[1])}\n>ke ${dayString(
-            days[2]
-        )}\n>to ${dayString(days[3])}\n>pe ${dayString(
-            days[4]
-        )} \n*Ensi viikolla:*\n>ma ${dayString(days[7])}\n>ti ${dayString(
-            days[8]
-        )} \n>ke ${dayString(days[9])}\n>to ${dayString(
-            days[10]
-        )}\n>pe ${dayString(days[11])}`;
+        let nextWeekDates = getNextWeekDates();
+        let thisMonday = nextWeekDates.thisMonday;
+        let nextWeekFriday = nextWeekDates.nextWeekFriday;
 
-        if (!allPublicHolidays) {
-            fullMessage =
-                fullMessage + "\n\nHUOM! Julkisia lomapäiviä ei voitu hakea!";
+        fullMessage += `🌴 *Ei lomalaisia ${thisMonday.toLocaleDateString(
+            "fi-FI"
+        )} - ${nextWeekFriday.toLocaleDateString("fi-FI")}*\n`;
+
+        for (
+            let i = thisMonday;
+            i <= nextWeekFriday;
+            i.setDate(i.getDate() + +1)
+        ) {
+            if (publicHolidayString(i)) {
+                fullMessage += publicHolidayString(i);
+            }
         }
+    } else {
+        fullMessage += `🌴 *Tulevina viikkoina ${vacationers} lomalaista.*\n\n*Tällä viikolla:*\n>ma ${dayString(
+            days[0]
+        )}>ti ${dayString(days[1])}>ke ${dayString(days[2])}>to ${dayString(
+            days[3]
+        )}>pe ${dayString(days[4])}*Ensi viikolla:*\n>ma ${dayString(
+            days[7]
+        )}>ti ${dayString(days[8])}>ke ${dayString(days[9])}>to ${dayString(
+            days[10]
+        )}>pe ${dayString(days[11])}`;
+    }
+    if (!allPublicHolidays) {
+        fullMessage += "\nHUOM! Julkisia lomapäiviä ei voitu hakea!";
     }
 
     axios
