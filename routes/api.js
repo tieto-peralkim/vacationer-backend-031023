@@ -17,7 +17,7 @@ const servers = [
         description: "Local",
     },
     {
-        url: "http://vacationer-sandbox.cem.ninja:3001",
+        url: "http://vacationer-sandbox.cem.ninja/api",
         description: "QA",
     },
     {
