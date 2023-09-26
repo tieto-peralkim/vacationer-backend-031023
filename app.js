@@ -62,7 +62,7 @@ if (
 ) {
     cron.schedule(cronRemoveDataSchedule, () => {
         console.log(
-            "Daily cron: Removing vacationers and teams over 1 month old, schedule",
+            "Daily cron: Removing deleted vacationers and teams over 1 month old, schedule",
             cronRemoveDataSchedule
         );
         remover

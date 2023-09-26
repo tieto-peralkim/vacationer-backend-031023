@@ -10,6 +10,11 @@ const middleWare = require("../utils/middleware");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerSchemas = require("../swaggerSchemas");
+let VERSION_NUMBER = process.env.REACT_APP_ENVIRONMENT;
+
+if (process.env.REACT_APP_ENVIRONMENT === "production") {
+    VERSION_NUMBER = process.env.REACT_APP_VERSION;
+}
 
 const servers = [
     {
@@ -48,13 +53,8 @@ const options = {
         openapi: "3.0.0",
         info: {
             title: "Vacationer API",
-            version: "0.3.0",
-            description:
-                "API for vacationers and teams, Slack messages and login",
-            contact: {
-                name: "Kimmo Perälä",
-                email: "kimmo.perala@tietoevry.com",
-            },
+            version: VERSION_NUMBER,
+            description: "API for vacationer.cem.ninja",
         },
         servers: [server],
         components: {
@@ -75,7 +75,7 @@ const options = {
             },
             {
                 name: "login",
-                description: "Login",
+                description: "Login and API status check",
             },
             {
                 name: "slack",
