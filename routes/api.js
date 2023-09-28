@@ -12,7 +12,10 @@ const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerSchemas = require("../swaggerSchemas");
 let VERSION_NUMBER = process.env.REACT_APP_ENVIRONMENT;
 
-if (process.env.REACT_APP_ENVIRONMENT === "production") {
+if (
+    process.env.REACT_APP_ENVIRONMENT === "production" ||
+    process.env.REACT_APP_ENVIRONMENT === "qa"
+) {
     VERSION_NUMBER = process.env.REACT_APP_VERSION;
 }
 
