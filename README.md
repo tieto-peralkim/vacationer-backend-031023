@@ -22,11 +22,15 @@ use <db name>
  db.vacationers.updateOne({nameId: <your Github user name>},{$set: {admin: true}})
 ```
 
-## Run local version:
-Start the backend (http://localhost:3001/<ENDPOINT>) with
+## Run locally:
+1. Start the backend to port 3001 with
 ```
 npm start
 ```
+
+## API Documentation
+Swagger endpoint <BACKEND_ADDRESS>/api-docs, e.g. http://localhost:3001/api-docs
+(you need to be logged in to Vacationer)
 
 ## Development instructions
 * Kanban board with Github issues: https://github.com/orgs/tieto-cem/projects/2/views/1
@@ -42,11 +46,4 @@ npm start
 * Move resolved issue(s) to "Test on Qa" column in Kanban. If feature branch was created from Github issue, this should happen automatically.
 * Test PR change on QA environment.
 * If testing is ok, move ticket to "Done" column. If not, move ticket to "In progress" column and add a new commit for PR.
-
-## PROD deployments
 * After completing ticket, inform the team about it. With team members decide when next PROD deployment will be.
-* How to: https://tietoevry-experience.atlassian.net/wiki/spaces/SUP/pages/3824844801/Vacationer+Lomasovellus#How-to-deploy
-
-## API Documentation
-Swagger endpoint <BACKEND_ADDRESS>/api-docs, e.g. http://localhost:3001/api-docs
-(you need to be logged in to Vacationer)
